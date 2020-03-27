@@ -1450,7 +1450,7 @@ p#liste {
                       `dieseNachtGestorben` INT (2) DEFAULT 0 ,
                       `countdownBis` INT (10) DEFAULT 0 ,
                       `countdownAb` INT (10) DEFAULT 0 ,
-                      `playerlog` LONGTEXT DEFAULT '' ,
+                      `playerlog` LONGTEXT ,
                       `bereit` INT (2) NULL ,
                       `reload` INT (2) NULL ,
                       `verifizierungsnr` INT ( 5 ) DEFAULT 0
@@ -1491,9 +1491,9 @@ p#liste {
                       `dorfzusatz` INT ( 10 ) DEFAULT 10 ,
                       `dorfstichwahltimer` INT ( 10 ) DEFAULT 200 ,
                       `dorfstichwahlzusatz` INT ( 10 ) DEFAULT 5 ,
-                      `tagestext` TEXT DEFAULT NULL ,
+                      `tagestext` TEXT ,
                       `nacht` INT ( 5 ) DEFAULT 1 ,
-                      `log` LONGTEXT DEFAULT '' ,
+                      `log` LONGTEXT ,
                       `list_lebe` LONGTEXT,
                       `list_lebe_aktualisiert` BIGINT DEFAULT 0,
                       `list_tot` LONGTEXT,
@@ -1618,7 +1618,7 @@ p#liste {
       }
 ?>
 <hr>
-<br>v1.0.3, Erstellt von Florian Lindenbauer
+<br>v1.0.4, Erstellt von Florian Lindenbauer
 <br>
 <form action="Werwolf.php" method="post">
   <p id = 'normal' align = "center">Löst oft viele Probleme: <input type="submit" value = "Reload" /></p>
