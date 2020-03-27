@@ -12,14 +12,14 @@ If you have any comments or tips, please let me know! If you like, you may also 
 The game is written in php, so will need a php parser on your webserver. You also need a database called "werwolf", you do not need to insert any tables, this is done by the script automatically.
 Rename 'includes.example.php' to 'includes.php' and insert your id, passwort and host.
 
-#Deutsche Anleitung
+# Deutsche Anleitung
 Das ist Quellcode einer php Internetanwendung "werwolfonline", die ich vor ein paar Jahren geschrieben habe. Man findet eine spielbare Version auf www.werwolfonline.eu
 
-Ursprünglich war es nicht geplant, den Quellcode zu veröffentlichen, aber nachdem dann ein (kleines) Interesse bestand, dachte ich mir, könnte ich den Quellcode auch open source veröffentlichen. Vielleicht kann jemand etwas damit anfangen!
-Allerdings würde ich mich nicht als professionellen Programmierer bezeichnen, daher sind sicher große Teile des Projekts sperrig, umständlich oder mühsam zu verstehen.
+UrsprÃ¼nglich war es nicht geplant, den Quellcode zu verÃ¶ffentlichen, aber nachdem dann ein (kleines) Interesse bestand, dachte ich mir, kÃ¶nnte ich den Quellcode auch open source verÃ¶ffentlichen. Vielleicht kann jemand etwas damit anfangen!
+Allerdings wÃ¼rde ich mich nicht als professionellen Programmierer bezeichnen, daher sind sicher groÃŸe Teile des Projekts sperrig, umstÃ¤ndlich oder mÃ¼hsam zu verstehen.
 
-Ich würde mich freuen, wenn jemand Tipps oder weitere Vorschläge hat! Wer will, kann natürlich auch via Git(Hub) beitragen, ich bin nur leider noch nicht sehr erfahren im Umgang auf GitHub - sry ...
+Ich wÃ¼rde mich freuen, wenn jemand Tipps oder weitere VorschlÃ¤ge hat! Wer will, kann natÃ¼rlich auch via Git(Hub) beitragen, ich bin nur leider noch nicht sehr erfahren im Umgang auf GitHub - sry ...
 
 # Was braucht man?
 Einen Webserver mit php interpreter und einer Datenbank namens "werwolf". Tabellen muss die Datenbank keine enthalten, die werden vom php Skript selbst erstellt.
-Benenne 'includes.example.php' in 'includes.php' um und füge id, passwort und host für die Anmeldung in der Datenbank hinzu!
+Benenne 'includes.example.php' in 'includes.php' um und fÃ¼ge id, passwort und host fÃ¼r die Anmeldung in der Datenbank hinzu!
