@@ -1618,7 +1618,7 @@ p#liste {
       }
 ?>
 <hr>
-<br>v1.0.3, Erstellt von Florian Lindenbauer
+<br>v1.0.4, Erstellt von Florian Lindenbauer
 <br>
 <form action="Werwolf.php" method="post">
   <p id = 'normal' align = "center">Löst oft viele Probleme: <input type="submit" value = "Reload" /></p>
