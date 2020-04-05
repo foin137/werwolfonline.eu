@@ -120,6 +120,8 @@ p#liste {
       //Schauen, ob wir uns bereits in einem Spiel befinden!
       if (isset($_COOKIE['SpielID']) && isset($_COOKIE['eigeneID']))
       {
+          $_COOKIE['SpielID'] = (int)$_COOKIE['SpielID'];
+          $_COOKIE['eigeneID'] = (int)$_COOKIE['eigeneID'];
           $spielID = $_COOKIE['SpielID'];
           $eigeneID = $_COOKIE['eigeneID'];
           if (isset($_POST['spielLoeschen']))
@@ -140,7 +142,7 @@ p#liste {
             if(isset($alleres->num_rows))
             {
               //Schauen, ob es auch mich als Spieler gibt und meine verifizierungsnr stimmt
-              $spielerResult = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID AND verifizierungsnr = ".$_COOKIE['verifizierungsnr']);
+              $spielerResult = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID AND verifizierungsnr = ".(int)$_COOKIE['verifizierungsnr']);
               if ($spielerResult->num_rows >= 1)
               {
                 
@@ -155,11 +157,14 @@ p#liste {
                 
                 //Nachschauen, ob ich Bürgermeister bin ... Dann nämlich anschreiben ...
                 $buergermRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE buergermeister = 1");
-                $buergermAss = $buergermRes->fetch_assoc();
-                if ($buergermAss['id']==$eigeneID)
+                if ($buergermRes->num_rows > 0)
                 {
-                  //Ich bin Bürgermeister
-                  echo "<p align='center' id='normal'>Sie sind Bürgermeister</p>";
+                  $buergermAss = $buergermRes->fetch_assoc();
+                  if ($buergermAss['id']==$eigeneID)
+                  {
+                    //Ich bin Bürgermeister
+                    echo "<p align='center' id='normal'>Sie sind Bürgermeister</p>";
+                  }
                 }
                 
                 //Bevor wir noch auf die Phase schauen, schauen wir, ob irgendetwas unabhängig von der Phase ist
@@ -205,7 +210,7 @@ p#liste {
                         //Dann setze buergermeisterDarfWeitergeben wieder auf 0
                         $mysqli->Query("UPDATE $spielID"."_spieler SET buergermeisterDarfWeitergeben = 0, reload = 1 WHERE id = $eigeneID");
                         $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1");
-                        $neuerBuergermeister = $_POST['buergermeisterID'];
+                        $neuerBuergermeister = (int)$_POST['buergermeisterID'];
                         $mysqli->Query("UPDATE $spielID"."_spieler SET buergermeister = 1 WHERE id = $neuerBuergermeister");
                         toGameLog($mysqli,getName($mysqli,$neuerBuergermeister)." wurde als Nachfolger des Bürgermeisters eingesetzt");
                         toAllPlayerLog($mysqli,getName($mysqli,$neuerBuergermeister)." wurde als Nachfolger des Bürgermeisters eingesetzt");
@@ -473,7 +478,7 @@ p#liste {
                               echo "<p id='normal' align='center'>Sie spielen nun gemeinsam mit Ihrem Geliebten, gehören Sie unterschiedlichen Gruppierungen an,
                               gewinnen Sie nur, wenn Sie alle anderen Spieler töten. Ansonsten gewinnen Sie wie gewohnt mit Ihrer Gruppierung (Dorfbewohner, Werwölfe)</p>";
                               //Auch den Charakter anzeigen
-                              $verliebtRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = ".$eigeneAssoc['verliebtMit']);
+                              $verliebtRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = ".(int)$eigeneAssoc['verliebtMit']);
                               $verliebtAss = $verliebtRes->fetch_assoc();
                               echo "<p align='center'>Identität: ".nachtidentitaetAlsString($verliebtAss['nachtIdentitaet'])."</p>";
                               toPlayerLog($mysqli,getName($mysqli,$eigeneAssoc['verliebtMit'])." ist ".nachtidentitaetAlsString($verliebtAss['nachtIdentitaet']),$eigeneID);
@@ -720,7 +725,7 @@ p#liste {
                             if (isset($_POST['werwolfAuswahl']) && !$zeitAbgelaufen)
                             {
                               //einmal die Wahl eintragen
-                              $wahlID = $_POST['werwolfID'];
+                              $wahlID = (int)$_POST['werwolfID'];
                               $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = $wahlID WHERE id = $eigeneID");
                               
                               //Schauen, ob wir einstimmig sein müssen
@@ -838,7 +843,7 @@ p#liste {
                                   $eigeneAssoc=eigeneAssoc($mysqli);
                                   if ($eigeneAssoc['hexeHeiltraenke']>0)
                                   {
-                                    $heilTraenkeNeu = $eigeneAssoc['hexeHeiltraenke']-1;
+                                    $heilTraenkeNeu = (int)$eigeneAssoc['hexeHeiltraenke']-1;
                                     $mysqli->Query("UPDATE $spielID"."_spieler SET hexeHeiltraenke = $heilTraenkeNeu, hexeHeilt = 1 WHERE id = $eigeneID");
                                     toPlayerLog($mysqli,"1 Heiltrank verwendet",$eigeneID);
                                     toGameLog($mysqli,"Die Hexe heilt das Opfer der Werwölfe");
@@ -862,8 +867,8 @@ p#liste {
                                   $eigeneAssoc=eigeneAssoc($mysqli);
                                   if ($eigeneAssoc['hexeTodestraenke']>0)
                                   {
-                                    $todestraenkeNeu = $eigeneAssoc['hexeTodestraenke']-1;
-                                    $hexenOpfer = $_POST['toeten'];
+                                    $todestraenkeNeu = (int)$eigeneAssoc['hexeTodestraenke']-1;
+                                    $hexenOpfer = (int)$_POST['toeten'];
                                     $mysqli->Query("UPDATE $spielID"."_spieler SET hexeTodestraenke = $todestraenkeNeu, hexenOpfer = $hexenOpfer WHERE id = $eigeneID");
                                     toPlayerLog($mysqli,"1 Todestrank verwendet für Spieler ".getName($mysqli,$hexenOpfer),$eigeneID);
                                     toGameLog($mysqli,"Die Hexe verwendet einen Todestrank, um ".getName($mysqli,$hexenOpfer)." zu töten");
@@ -1019,7 +1024,7 @@ p#liste {
                         if (isset($_POST['buergermeisterWahlAuswahl']))
                         {
                           //einmal die Wahl eintragen
-                          $wahlID = $_POST['buergermeisterID'];
+                          $wahlID = (int)$_POST['buergermeisterID'];
                           $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = $wahlID WHERE id = $eigeneID");
                           //Dann schauen, ob wir schon eine Mehrheit haben
                           $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
@@ -1113,7 +1118,7 @@ p#liste {
                           {
                             //Ich klage gerade jemanden an
                             if ($_POST['angeklagterID']!=-1)
-                              $mysqli->Query("UPDATE $spielID"."_spieler SET angeklagtVon = $eigeneID WHERE id = ".$_POST['angeklagterID']);
+                              $mysqli->Query("UPDATE $spielID"."_spieler SET angeklagtVon = $eigeneID WHERE id = ".(int)$_POST['angeklagterID']);
                           }
                           else
                           {
@@ -1182,7 +1187,7 @@ p#liste {
                           if (isset($_POST['dorfWahlID']))
                           {
                             //einmal die Wahl eintragen
-                            $wahlID = $_POST['dorfWahlID'];
+                            $wahlID = (int)$_POST['dorfWahlID'];
                             $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = $wahlID WHERE id = $eigeneID");
                             //Dann schauen, ob wir schon eine Mehrheit haben
                             $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
@@ -1310,7 +1315,7 @@ p#liste {
                           if (isset($_POST['dorfWahlID']))
                           {
                             //einmal die Wahl eintragen
-                            $wahlID = $_POST['dorfWahlID'];
+                            $wahlID = (int)$_POST['dorfWahlID'];
                             $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = $wahlID WHERE id = $eigeneID");
                             //Dann schauen, ob wir schon eine Mehrheit haben
                             $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
@@ -1460,7 +1465,10 @@ p#liste {
                     //Wähle ein Verifizierungs-Passwort aus:
                     //Dieses dient dazu, um festzustellen, ob es tatsächlich der richtige Spieler ist, der eine Seite lädt
                     $verifizierungsnr = rand(2,100000);
-                    $mysqli->Query("INSERT INTO $spielID"."_spieler"." (id, name , spielleiter, lebt, reload, verifizierungsnr) VALUES ( 0 , '".$_POST['ihrName']."', 1 , 0 , 1, $verifizierungsnr)");
+                    $stmt = $mysqli->prepare("INSERT INTO $spielID"."_spieler"." (id, name , spielleiter, lebt, reload, verifizierungsnr) VALUES ( 0 , ?, 1 , 0 , 1, ?)");
+                    $stmt->bind_param('si',$_POST['ihrName'],$verifizierungsnr);
+                    $stmt->execute();
+                    $stmt->close();
                     $sql2 = "
                       CREATE TABLE `$spielID"."_game` (
                       `spielphase` INT( 5 ) DEFAULT 0,
@@ -1501,7 +1509,6 @@ p#liste {
                       `letzterAufruf` BIGINT
                       ) ;";
                     $mysqli->Query($sql2);
-                    echo $mysqli->error;
                     $mysqli->Query("INSERT INTO $spielID"."_game (spielphase, letzterAufruf) VALUES (0 , ".time().")");
                     
                     //Die SpielID groß mitteilen
@@ -1540,7 +1547,10 @@ p#liste {
                   //Ein Spiel dieser Nummer existiert!
                   $verboteneNamen = array("niemanden","niemand","keinen","keiner","dorfbewohner","werwolf","seher","seherin","hexe","hexer","jäger","amor","beschützer","paranormaler ermittler","lykantroph","lykantrophin","spion","spionin","mordlustiger","mordlustige","pazifist","pazifistin","alter mann","alter","alte","alte frau","die alten","alten");
                   //Nachschauen, ob mein Name noch nicht vorkommt...
-                  $nameRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE name = '".$_POST['ihrName']."'");
+                  $stmt = $mysqli->prepare("SELECT * FROM $spielID"."_spieler WHERE name = ?");
+                  $stmt->bind_param('s',$_POST['ihrName']);
+                  $stmt->execute();
+                  $nameRes = $stmt->get_result();
                   if ($nameRes->num_rows <= 0 && !in_array(strtolower($_POST['ihrName']),$verboteneNamen))
                   {
                    //Name gültig
@@ -1562,7 +1572,10 @@ p#liste {
                           //Wähle ein Verifizierungs-Passwort aus:
                           //Dieses dient dazu, um festzustellen, ob es tatsächlich der richtige Spieler ist, der eine Seite lädt
                           $verifizierungsnr = rand(2,100000); // 0 als Standard darf nicht vorkommen
-                          $mysqli->Query("INSERT INTO $spielID"."_spieler"." (id, name , spielleiter, reload, verifizierungsnr) VALUES ( $i , '".$_POST['ihrName']."', 0 , 1, $verifizierungsnr)");
+                          $stmt = $mysqli->prepare("INSERT INTO $spielID"."_spieler"." (id, name , spielleiter, reload, verifizierungsnr) VALUES ( ? , ?, 0 , 1, ?)");
+                          $stmt->bind_param('isi', $i, $_POST['ihrName'], $verifizierungsnr);
+                          $stmt->execute();
+                          $stmt->close();
                           echo "<p align='center'>Sie sind dem Spiel erfolgreich beigetreten!</p>";
                           setcookie ("SpielID", $spielID, time()+172800);
                           setcookie ("eigeneID",$i, time()+172800);
@@ -1589,6 +1602,7 @@ p#liste {
                   {
                      echo "<p id='error' align='center'>Der angegebene Name ist bereits vorhanden oder ungültig</p>";
                   }
+                  $stmt->close();
                 }
                 else
                 {
@@ -1618,7 +1632,7 @@ p#liste {
       }
 ?>
 <hr>
-<br>v1.0.4, Erstellt von Florian Lindenbauer
+<br>v1.0.5, Erstellt von Florian Lindenbauer
 <br>
 <form action="Werwolf.php" method="post">
   <p id = 'normal' align = "center">Löst oft viele Probleme: <input type="submit" value = "Reload" /></p>
@@ -1818,15 +1832,15 @@ var sekBisTimerBeginn;
   {
     <?php if ($pageReload && !$listReload) 
     {
-      echo 'reloadmaintain('.$_COOKIE['SpielID'].','.$_COOKIE['eigeneID'].');';
+      echo 'reloadmaintain('.(int)$_COOKIE['SpielID'].','.(int)$_COOKIE['eigeneID'].');';
     }
     elseif ($listReload  && !$pageReload)
     {
-      echo 'listRefresh('.$_COOKIE['SpielID'].','.$_COOKIE['eigeneID'].');';
+      echo 'listRefresh('.(int)$_COOKIE['SpielID'].','.(int)$_COOKIE['eigeneID'].');';
     }
     elseif ($listReload && $pageReload)
     {
-        echo 'listRefresh('.$_COOKIE['SpielID'].','.$_COOKIE['eigeneID'].',1);';    
+        echo 'listRefresh('.(int)$_COOKIE['SpielID'].','.(int)$_COOKIE['eigeneID'].',1);';    
     }
     
     if ($timerZahl > 0)
@@ -2263,29 +2277,29 @@ function spielRegelnAnwenden($mysqli)
   if (isset($_POST['buergermeister']))
   {
     //Zuerst überprüfen, ob die Variablen überhaupt existieren
-    $buergermeisterWeitergeben = $_POST['buergermeister'];
-    $charaktereAufdecken = $_POST['aufdecken'];
-    $seherSiehtIdentitaet = $_POST['seherSieht'];
-    $hexenzahl = $_POST['hexe'];
-    $jaegerzahl = $_POST['jaeger'];
-    $seherzahl = $_POST['seher'];
-    $amorzahl = $_POST['amor'];
-    $beschuetzerzahl = $_POST['beschuetzer'];
-    $parErmZahl = $_POST['parErm'];
-    $lykantrophenzahl = $_POST['lykantrophen'];
-    $spionezahl = $_POST['spione'];
-    $idiotenzahl = $_POST['idioten'];
-    $pazifistenzahl = $_POST['pazifisten'];
-    $altenzahl = $_POST['alten'];
-    $werwolftimer1 = $_POST['werwolftimer1'];
-    $werwolfzusatz1 = $_POST['werwolfzusatz1'];
-    $werwolftimer2 = $_POST['werwolftimer2'];
-    $werwolfzusatz2 = $_POST['werwolfzusatz2'];
-    $dorftimer = $_POST['dorftimer'];
-    $dorfzusatz = $_POST['dorfzusatz'];
-    $dorfstichwahltimer = $_POST['dorfstichwahltimer'];
-    $dorfstichwahlzusatz = $_POST['dorfstichwahlzusatz'];
-    $zufaelligeAuswahlBonus = $_POST['zufaelligeAuswahlBonus'];
+    $buergermeisterWeitergeben = (int)$_POST['buergermeister'];
+    $charaktereAufdecken = (int)$_POST['aufdecken'];
+    $seherSiehtIdentitaet = (int)$_POST['seherSieht'];
+    $hexenzahl = (int)$_POST['hexe'];
+    $jaegerzahl = (int)$_POST['jaeger'];
+    $seherzahl = (int)$_POST['seher'];
+    $amorzahl = (int)$_POST['amor'];
+    $beschuetzerzahl = (int)$_POST['beschuetzer'];
+    $parErmZahl = (int)$_POST['parErm'];
+    $lykantrophenzahl = (int)$_POST['lykantrophen'];
+    $spionezahl = (int)$_POST['spione'];
+    $idiotenzahl = (int)$_POST['idioten'];
+    $pazifistenzahl = (int)$_POST['pazifisten'];
+    $altenzahl = (int)$_POST['alten'];
+    $werwolftimer1 = (int)$_POST['werwolftimer1'];
+    $werwolfzusatz1 = (int)$_POST['werwolfzusatz1'];
+    $werwolftimer2 = (int)$_POST['werwolftimer2'];
+    $werwolfzusatz2 = (int)$_POST['werwolfzusatz2'];
+    $dorftimer = (int)$_POST['dorftimer'];
+    $dorfzusatz = (int)$_POST['dorfzusatz'];
+    $dorfstichwahltimer = (int)$_POST['dorfstichwahltimer'];
+    $dorfstichwahlzusatz = (int)$_POST['dorfstichwahlzusatz'];
+    $zufaelligeAuswahlBonus = (int)$_POST['zufaelligeAuswahlBonus'];
     $zufaelligauswaehlen = 0;
     if (isset($_POST['zufaelligauswaehlen']))
     {
@@ -2632,7 +2646,7 @@ function spielStarten($mysqli)
   $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
   while ($temp = $res->fetch_assoc())
   {
-    $i = $temp['id'];
+    $i = (int)$temp['id'];
     if ($temp['nachtIdentitaet']==CHARHEXE)
     {
       //4 = Hexe
@@ -2679,8 +2693,9 @@ function weiseCharakterZu($anzahlSpieler,$identitaet,$mysqli)
   {
     $temp = $freieSpieler->fetch_assoc();
     //Diesem Spieler die Identität zuweisen
-    $id = $temp['id'];
+    $id = (int)$temp['id'];
     //Mache ihn zu dem Charakter
+    $identitaet = (int)$identitaet;
     $mysqli->Query("UPDATE $spielID"."_spieler SET nachtIdentitaet = $identitaet WHERE id = $id");
     //echo "<BR>Weise $id die Identität $identitaet zu";
     toGameLog($mysqli,"Weise ".getName($mysqli,$id)." die Nachtidentitaet ".nachtidentitaetAlsString($identitaet)." zu.");
@@ -2754,7 +2769,7 @@ function phaseInitialisieren($phase,$mysqli)
     
     //Zuerst mal schauen, ob das Opfer der Werwölfe gestorben ist.
     $gameA = gameAssoc($mysqli);
-    $werwolfopfer = $gameA['werwolfopfer'];
+    $werwolfopfer = (int)$gameA['werwolfopfer'];
     if ($werwolfopfer > -1)
     {
       //Die Werwölfe haben ein Opfer ausgewählt
@@ -2845,8 +2860,10 @@ function phaseInitialisieren($phase,$mysqli)
     
     //Jetzt lösche noch die Zahlen, die in diesem Schritt gebraucht wurden
     $mysqli->Query("UPDATE $spielID"."_spieler SET hexeHeilt = 0, hexenOpfer = -1");
-    $mysqli->Query("UPDATE $spielID"."_game SET werwolfopfer = -1, tagestext = '$anzeigeString'");
-    
+    $stmt = $mysqli->prepare("UPDATE $spielID"."_game SET werwolfopfer = -1, tagestext = ?");
+    $stmt->bind_param('s',$anzeigeString);
+    $stmt->execute();
+    $stmt->close();
     //Schaue nach, ob wir schon einen Sieger haben
     checkeSiegbedingungen($mysqli);
   }
@@ -2902,7 +2919,7 @@ function toeteSpieler($mysqli, $spielerID)
   //Wird aufgerufen, wenn dieser Spieler stirbt
   $spielID = $_COOKIE['SpielID'];
   $eigeneID = $_COOKIE['eigeneID'];
-  
+  $spielerID = (int)$spielerID;
   //Nachschauen, ob es der Jäger ist ...
   $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $spielerID");
   $temp = $res->fetch_assoc();
@@ -3099,7 +3116,7 @@ function seherInitialisiere($mysqli)
 function seherSehe($mysqli, $id)
 {
   //id = die Id des Spielers, der gesehen wird
-  
+  $id = (int)$id;
   $spielID = $_COOKIE['SpielID'];
   $eigeneID = $_COOKIE['eigeneID'];
   //schauen, ob es ein valider Spieler ist
@@ -3160,6 +3177,7 @@ function beschuetzerAuswahl($mysqli,$id)
 {
   $spielID = $_COOKIE['SpielID'];
   $eigeneID = $_COOKIE['eigeneID'];
+  $id = (int)$id;
   //schauen, ob es ein valider Spieler ist
   $spielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $id AND lebt = 1");
   if ($spielerRes->num_rows < 1)
@@ -3207,6 +3225,7 @@ function parErmAusgewaehlt($mysqli, $id)
 {
   $spielID = $_COOKIE['SpielID'];
   $eigeneID = $_COOKIE['eigeneID'];
+  $id = (int)$id;
   //schauen, ob es ein valider Spieler ist
   $spielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $id AND lebt = 1");
   if ($spielerRes->num_rows < 1)
@@ -3439,6 +3458,8 @@ function endeDerAbstimmungStichwahl($id1, $id2, $mysqli)
 {
   //Stichwahl zwischen id1 und id2
   $spielID = $_COOKIE['SpielID'];
+  $id1 = (int)$id1;
+  $id2 = (int)$id2;
   //Diesmal gehe ich nicht über phaseBeendenWennAlleBereit...
   $mysqli->Query("UPDATE $spielID"."_spieler SET angeklagtVon = -1");
   $mysqli->Query("UPDATE $spielID"."_spieler SET angeklagtVon = 0 WHERE id = $id1");
@@ -3625,6 +3646,7 @@ function diesesSpielLoeschenButton()
 function alleReloadAusser($spielerID,$mysqli)
 {
   $spielID = $_COOKIE['SpielID'];
+  $spielerID = (int)$spielerID;
   $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1");
   $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 0 WHERE id = $spielerID");
 }
@@ -3632,12 +3654,15 @@ function alleReloadAusser($spielerID,$mysqli)
 function setReloadZero($spielerID, $mysqli)
 {
   $spielID = $_COOKIE['SpielID'];
+  $spielerID = (int)$spielerID;
   $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 0 WHERE id = $spielerID");
 }
 
 function setBereit($mysqli,$spielerID,$bereit)
 {
   $spielID = $_COOKIE['SpielID'];
+  $spielerID = (int)$spielerID;
+  $bereit = (int)$bereit;
   $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = $bereit WHERE id = $spielerID");
 }
 
@@ -3662,6 +3687,7 @@ function getName($mysqli, $spielerID)
 {
   //Gibt den Namen des Spielers mit der $spielerID zurück
   $spielID = $_COOKIE['SpielID'];
+  $spielerID = (int)$spielerID;
   $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $spielerID");
   $temp = $res->fetch_assoc();
   return $temp['name'];
@@ -3793,19 +3819,26 @@ function toGameLog($mysqli,$logeintrag)
   $aktLog = $gameAssoc['log'];
   $neuLog = $aktLog.date("H:i:s").": ".$logeintrag."<br>";
   $neuLog = str_replace("'",'"',$neuLog); //ersetze alle ' mit "
-  $mysqli->Query("UPDATE $spielID"."_game SET log = '$neuLog'");
+  $stmt = $mysqli->prepare("UPDATE $spielID"."_game SET log = ?");
+  $stmt->bind_param("s",$neuLog);
+  $stmt->execute();
+  $stmt->close();
 }
 
 function toPlayerLog($mysqli, $logeintrag, $spieler)
 {
   //Fügt dem Spielerlog des Spielers den logEintrag hinzu
   $spielID = $_COOKIE['SpielID'];
+  $spieler = (int)$spieler;
   $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $spieler");
   $temp = $res->fetch_assoc();
   $aktLog = $temp['playerlog'];
   $neuLog = $aktLog.date("H:i:s").": ".$logeintrag."<BR>";
   $neuLog = str_replace("'",'"',$neuLog); //ersetze alle ' mit "
-  $mysqli->Query("UPDATE $spielID"."_spieler SET playerlog = '$neuLog' WHERE id = $spieler");
+  $stmt = $mysqli->prepare("UPDATE $spielID"."_spieler SET playerlog = ? WHERE id = ?");
+  $stmt->bind_param("si",$neuLog, $spieler);
+  $stmt->execute();
+  $stmt->close();
 }
 
 function toAllPlayerLog($mysqli, $logeintrag)
