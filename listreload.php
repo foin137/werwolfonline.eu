@@ -92,14 +92,14 @@
       //Schaue nach, ob ich Werwolf bin
       $myRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $id");
       $myAssoc = $myRes->fetch_assoc();
-      if ($myAssoc['nachtIdentitaet'] == CHARWERWOLF) 
+      if ($myAssoc['nachtIdentitaet'] == CHARWERWOLF || $myAssoc['nachtIdentitaet'] == CHARURWOLF) 
       {
         //Ich bin Werwolf --> Liste der (lebenden) Werwölfe
         $spielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
         while ($temp = $spielerRes->fetch_assoc())
         {
         
-          if ($temp['nachtIdentitaet']==CHARWERWOLF && $temp['lebt']==1)
+          if (($temp['nachtIdentitaet']==CHARWERWOLF || $temp['nachtIdentitaet']==CHARURWOLF) && $temp['lebt']==1)
           {
             if ($temp['wahlAuf']==-1)
               echo $trennzeichen.$temp['name']." (wach)".$trennzeichen."0";
@@ -306,11 +306,14 @@
           break;
         case CHARALTERMANN:
           $identitaet = "Alte(r)";
+          break;
+        case CHARURWOLF:
+          $identitaet = "Urwolf/Urwölfin"; 
           break; 
       }
   //Eine Liste aller aktiver Spieler anzeigen
   //zuerst alle Lebenden anzeigen
-      if (($phase == PHASENACHT3 && $temp['nachtIdentitaet'] == CHARWERWOLF) || $phase == PHASEBUERGERMEISTERWAHL || $phase == PHASEDISKUSSION || $phase == PHASEANKLAGEN || $phase == PHASEABSTIMMUNG) //In diesen Phasen können die Werwölfe abstimmen
+      if (($phase == PHASENACHT3 && ($temp['nachtIdentitaet'] == CHARWERWOLF || $temp['nachtIdentitaet'] == CHARURWOLF)) || $phase == PHASEBUERGERMEISTERWAHL || $phase == PHASEDISKUSSION || $phase == PHASEANKLAGEN || $phase == PHASEABSTIMMUNG) //In diesen Phasen können die Werwölfe abstimmen
       {
         if ($temp['wahlAuf']==-1)
           $rueckgabe.= $trennzeichen.$temp['name']." ($identitaet, wach)".$trennzeichen."0";
@@ -399,7 +402,10 @@
           break;
         case CHARALTERMANN:
           $identitaet = "Alte(r)";
-          break;  
+          break;
+        case CHARURWOLF:
+          $identitaet = "Urwolf/Urwölfin"; 
+          break; 
       }
   //Eine Liste aller aktiver Spieler anzeigen
   //zuerst alle Lebenden anzeigen

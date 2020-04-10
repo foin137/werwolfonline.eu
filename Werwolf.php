@@ -129,6 +129,9 @@ p#liste {
             //Will der Spieler das Spiel löschen?
             if ($_POST['spielLoeschen'] == 1)
             {
+              //Sicherheitshalber auch den Spieler entfernen
+              aus_spiel_entfernen((int)$eigeneID,$mysqli);
+              toGameLog($mysqli, getName($mysqli,$eigeneID). " hat das Spiel verlassen.");
               //Cookies löschen
               setcookie ("SpielID", 0, time()-172800); 
               setcookie ("eigeneID",0, time()-172800);
@@ -153,7 +156,8 @@ p#liste {
                 //Dass wir aber nicht ohne Grund reloaden, setzen wir für uns selbst reload auf false:
                 setReloadZero($eigeneID,$mysqli);
                 //echo "<p algin='center' id='normal'>Du befindest dich bereits in einem Spiel, Name: ".getName($mysqli,$eigeneID)."</p>";
-                echo "<p id='normal' align='center'>Name: ". getName($mysqli,$eigeneID)."</p>";
+                $myname = getName($mysqli,$eigeneID);
+                echo "<p id='normal' align='center'>Name: ". $myname ."</p>";
                 
                 //Nachschauen, ob ich Bürgermeister bin ... Dann nämlich anschreiben ...
                 $buergermRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE buergermeister = 1");
@@ -165,6 +169,19 @@ p#liste {
                     //Ich bin Bürgermeister
                     echo "<p align='center' id='normal'>Sie sind Bürgermeister</p>";
                   }
+                }
+                
+                //Vielleicht will der Spielleiter jemanden entfernen?
+                if (isset($_POST['spieler_entfernen']) && isset($_POST['entfernenID']))
+                {
+                    $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID AND spielleiter = 1");
+                    if ($res->num_rows > 0)
+                    {
+                        aus_spiel_entfernen((int)$_POST['entfernenID'],$mysqli);
+                        $text = $myname."(Spielleiter) hat ".getName($mysqli,(int)($_POST['entfernenID'])). " aus dem Spiel entfernt.";
+                        toGameLog($mysqli, $text);
+                        toAllPlayerLog($mysqli, $text);
+                    }
                 }
                 
                 //Bevor wir noch auf die Phase schauen, schauen wir, ob irgendetwas unabhängig von der Phase ist
@@ -649,7 +666,7 @@ p#liste {
                               }
                             }
                           }
-                          elseif ($identitaet == CHARWERWOLF)
+                          elseif ($identitaet == CHARWERWOLF || $identitaet == CHARURWOLF)
                           {
                             //WERWÖLFE
                             $zeitAbgelaufen = false;
@@ -664,14 +681,14 @@ p#liste {
                                 //Es handelt sich um die Einstimmigkeits-Abstimmung, mal sehen ob wir mehr als 2
                                 //Werwölfe haben, dann starte einen neuen Timer [Anm.: müssen wir haben, da sonst werwolfeinstimmig gleich auf 0 gesetzt wird]
                                 //Starte einen neuen Timer, bei dem die Abstimmung nicht mehr einstimmig sein muss ...
-                                $werwolfQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE nachtIdentitaet = ". CHARWERWOLF ." AND lebt = 1");
+                                $werwolfQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ".CHARURWOLF.") AND lebt = 1");
                                 $werwolfzahl = $werwolfQ->num_rows;
                                 $countdownBis = time()+$gameAssoc['werwolftimer2']+$gameAssoc['werwolfzusatz2']*$werwolfzahl;
                                 if ($countdownBis >= time()+15)
                                   $countdownAb = time()+5;
                                 else
                                   $countdownAb = time();
-                                $mysqli->Query("UPDATE $spielID"."_spieler SET countdownBis = $countdownBis, countdownAb = $countdownAb WHERE nachtIdentitaet = ". CHARWERWOLF ." AND lebt = 1");
+                                $mysqli->Query("UPDATE $spielID"."_spieler SET countdownBis = $countdownBis, countdownAb = $countdownAb WHERE (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ".CHARURWOLF.") AND lebt = 1");
                                 $mysqli->Query("UPDATE $spielID"."_game SET werwolfeinstimmig = 0");
                                 
                                 //Timer initialiseren
@@ -682,17 +699,17 @@ p#liste {
                                 
                                 //Überprüfe, ob es nicht jetzt schon eine Einstimmigkeit gibt...
                                 //Die Wahl muss nicht einstimmig sein ...
-                                $werwolfQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE nachtIdentitaet = ". CHARWERWOLF ." AND lebt = 1");
+                                $werwolfQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ".CHARURWOLF.") AND lebt = 1");
                                 $werwolfzahl = $werwolfQ->num_rows;
                                 $alleSpielerQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                                 while ($temp = $alleSpielerQ->fetch_assoc())
                                 {
-                                   $query = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND nachtIdentitaet = ". CHARWERWOLF ." AND wahlAuf = ".$temp['id']);
+                                   $query = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ". CHARURWOLF .") AND wahlAuf = ".$temp['id']);
                                    if ($query->num_rows > $werwolfzahl/2)
                                    {
                                     //Mit Mehrheit beschlossen...
                                     $opfer = $temp['id'];
-                                    $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, reload = 1 WHERE nachtIdentitaet = ".CHARWERWOLF);
+                                    $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, reload = 1 WHERE (nachtIdentitaet = ".CHARWERWOLF." OR nachtIdentitaet = ".CHARWERWOLF.")");
                                     $mysqli->Query("UPDATE $spielID"."_game SET werwolfopfer = $opfer");
                                     phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli); //Schauen, ob wir die Phase schon beenden können
                                     toGameLog($mysqli,"Die Wahl der Werwölfe fiel mehrheitlich auf: ".$temp['name']);
@@ -704,7 +721,7 @@ p#liste {
                               {
                                 //Fehlschlag
                                 $zeitAbgelaufen = true;
-                                $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, reload = 1 WHERE nachtIdentitaet = ".CHARWERWOLF);
+                                $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, reload = 1 WHERE (nachtIdentitaet = ".CHARWERWOLF." OR nachtIdentitaet = ".CHARURWOLF.")");
                                 $mysqli->Query("UPDATE $spielID"."_game SET werwolfopfer = -1");
                                 phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli); //Schauen, ob wir die Phase schon beenden können
                                 toGameLog($mysqli,"Die Werwölfe konnten sich nicht auf ein Opfer einigen ...");
@@ -738,7 +755,7 @@ p#liste {
                                 $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                                 while ($temp = $alleSpielerRes->fetch_assoc())
                                 {
-                                  if ($temp['nachtIdentitaet']==CHARWERWOLF)
+                                  if ($temp['nachtIdentitaet']==CHARWERWOLF || $temp['nachtIdentitaet'] == CHARURWOLF)
                                   {
                                     if ($temp['wahlAuf'] != $opfer)
                                       $einstimmig = 0;
@@ -747,7 +764,7 @@ p#liste {
                                 //Falls einstimmig--> Alle Werwölfe auf bereit setzen und weiter gehts ;)
                                 if ($einstimmig == 1)
                                 {
-                                  $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, reload = 1 WHERE nachtIdentitaet = ".CHARWERWOLF);
+                                  $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, reload = 1 WHERE (nachtIdentitaet = ".CHARWERWOLF. " OR nachtIdentitaet = ". CHARURWOLF.")");
                                   $mysqli->Query("UPDATE $spielID"."_game SET werwolfopfer = $opfer");
                                   phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli); //Schauen, ob wir die Phase schon beenden können
                                   toGameLog($mysqli,"Die Wahl der Werwölfe fiel einstimmig auf: ". getName($mysqli,$opfer)); 
@@ -756,17 +773,17 @@ p#liste {
                               else
                               {
                                 //Die Wahl muss nicht einstimmig sein ...
-                                $werwolfQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE nachtIdentitaet = ". CHARWERWOLF ." AND lebt = 1");
+                                $werwolfQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ". CHARURWOLF.") AND lebt = 1");
                                 $werwolfzahl = $werwolfQ->num_rows;
                                 $alleSpielerQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                                 while ($temp = $alleSpielerQ->fetch_assoc())
                                 {
-                                   $query = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND nachtIdentitaet = ". CHARWERWOLF ." AND wahlAuf = ".$temp['id']);
+                                   $query = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ".CHARURWOLF.") AND wahlAuf = ".$temp['id']);
                                    if ($query->num_rows > $werwolfzahl/2)
                                    {
                                     //Mit Mehrheit beschlossen...
                                     $opfer = $temp['id'];
-                                    $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, reload = 1 WHERE nachtIdentitaet = ".CHARWERWOLF);
+                                    $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, reload = 1 WHERE nachtIdentitaet = ".CHARWERWOLF." OR nachtIdentitaet = ".CHARURWOLF);
                                     $mysqli->Query("UPDATE $spielID"."_game SET werwolfopfer = $opfer");
                                     phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli); //Schauen, ob wir die Phase schon beenden können
                                     toGameLog($mysqli,"Die Wahl der Werwölfe fiel mehrheitlich auf: ".$temp['name']);
@@ -893,6 +910,49 @@ p#liste {
                               hexeInitialisieren($mysqli);
                             }
                           }
+                          elseif ($identitaet == CHARURWOLF)
+                          {
+                            if (isset($_POST['urwolfHatAusgewaehlt']) && isset($_POST['urwolfID']))
+                            {
+                              if (urwolfHandle($mysqli,$_POST['urwolfID'])==false)
+                              {
+                                //Ungültiger Zug, nochmals von vorne
+                                urwolfInitialisiere($mysqli);
+                              }
+                              else
+                              {
+                                //Gültiger Zug!
+                                warteAufAndere();
+                                $pageReload = true;
+                                phaseBeendenWennAlleBereit(PHASENACHT4,$mysqli);
+                              }
+                            }
+                            else
+                            {
+                              $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID");
+                              $a = $res->fetch_assoc();
+                              if ($a['urwolf_anzahl_faehigkeiten'] > 0)
+                              {
+                                urwolfInitialisiere($mysqli);
+                              }
+                              else
+                              {
+                                if (isset($_POST['weiterschlafen']))
+                                {
+                                  //der Button wurde bereits geklickt
+                                  setBereit($mysqli,$eigeneID,1);
+                                  warteAufAndere();
+                                  $pageReload = true;
+                                  phaseBeendenWennAlleBereit(PHASENACHT4,$mysqli);
+                                }
+                                else
+                                {
+                                  //zeige den Button an
+                                  dorfbewohnerWeiterschlafen();
+                                }  
+                              }
+                            }  
+                          }
                           else
                           {
                             //keine Besondere Identitaet diese Nacht
@@ -942,6 +1002,11 @@ p#liste {
                         echo "<p align='center'>Der Tag beginnt</p>";
                         $eigeneAssoc = eigeneAssoc($mysqli);
                         echo "<p align='center'>$tagestext</p>";
+                        if ($eigeneAssoc['popup_text'] != "")
+                        {
+                            echo "<br><p align='center'>".$eigeneAssoc['popup_text']."</p>";
+                            $mysqli->Query("UPDATE $spielID"."_spieler SET popup_text = '' WHERE id = $eigeneID");
+                        }
                         //Nachsehen, ob es einen Bürgermeister gibt
                         $bres = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE buergermeister = 1");
                         if ($bres->num_rows > 0)
@@ -1027,13 +1092,21 @@ p#liste {
                           $wahlID = (int)$_POST['buergermeisterID'];
                           $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = $wahlID WHERE id = $eigeneID");
                           //Dann schauen, ob wir schon eine Mehrheit haben
+                          
+                          //Generiere eine Text zum Anzeigen, wer für wen gestimmt hat
                           $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
+                          $text = "";
                           $anzahlSpieler = $alleSpielerRes->num_rows;
                           while ($temp = $alleSpielerRes->fetch_assoc())
                           {
-                            if (!isset($wahlAufSpieler[$temp['wahlAuf']]))
-                              $wahlAufSpieler[$temp['wahlAuf']] = 0;
-                            $wahlAufSpieler[$temp['wahlAuf']]+=1;
+                            $w = $temp['wahlAuf'];
+                            if (!isset($wahlAufSpieler[$w]))
+                              $wahlAufSpieler[$w] = 0;
+                            $wahlAufSpieler[$w]++;
+                            if ($w > -1)
+                            {
+                                $text .= $temp['name']." -> ". getName($mysqli,$w). ", "; 
+                            }
                           }
                           //Schauen, ob jemand mehr als 50% der Stimmen hat
                           foreach ($wahlAufSpieler as $id => $stimmen)
@@ -1043,8 +1116,8 @@ p#liste {
                               //Dieser Spieler hat die Mehrheit
                               $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1");
                               $mysqli->Query("UPDATE $spielID"."_spieler SET buergermeister = 1 WHERE id = $id");
-                              toGameLog($mysqli,getName($mysqli,$id)." wurde zum Bürgermeister gewählt");
-                              toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde zum Bürgermeister gewählt");
+                              toGameLog($mysqli,getName($mysqli,$id)." wurde zum Bürgermeister gewählt, abgestimmt haben: $text");
+                              toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde zum Bürgermeister gewählt, abgestimmt haben: $text");
                               phaseBeendenWennAlleBereit(PHASEBUERGERMEISTERWAHL,$mysqli); 
                               break;
                             }
@@ -1190,16 +1263,22 @@ p#liste {
                             $wahlID = (int)$_POST['dorfWahlID'];
                             $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = $wahlID WHERE id = $eigeneID");
                             //Dann schauen, ob wir schon eine Mehrheit haben
+                            $text = "";
                             $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                             $anzahlSpieler = $alleSpielerRes->num_rows;
                             while ($temp = $alleSpielerRes->fetch_assoc())
                             {
-                              if (!isset($wahlAufSpieler[$temp['wahlAuf']]))
-                                $wahlAufSpieler[$temp['wahlAuf']] = 0;
-                              $wahlAufSpieler[$temp['wahlAuf']]+=1;
+                              $w = $temp['wahlAuf'];
+                              if (!isset($wahlAufSpieler[$w]))
+                                $wahlAufSpieler[$w] = 0;
+                              $wahlAufSpieler[$w]+=1;
                               //Falls es der Bürgermeister ist, zusätzliche 1/2 Stimme
                               if ($temp['buergermeister']==1)
-                                $wahlAufSpieler[$temp['wahlAuf']]+=0.5;
+                                $wahlAufSpieler[$w]+=0.5;
+                              if ($w > -1)
+                              {
+                                  $text .= $temp['name']." -> ". getName($mysqli,$w). ", "; 
+                              }
                             }
                             $wahlErfolgreich = 0;
                             //Schauen, ob jemand mehr als 50% der Stimmen hat
@@ -1208,8 +1287,8 @@ p#liste {
                               if ($stimmen > (($anzahlSpieler+0.5)/2) && $id > -1)
                               {
                                 //Dieser Spieler hat die Mehrheit
-                                toGameLog($mysqli,getName($mysqli,$id)." wurde bei der Abstimmung zum Tode verurteilt");
-                                toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde vom Dorf zum Tode verurteilt");
+                                toGameLog($mysqli,getName($mysqli,$id)." wurde bei der Abstimmung zum Tode verurteilt, mit den Stimmen: $text");
+                                toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde vom Dorf zum Tode verurteilt, mit den Stimmen: $text");
                                 endeDerAbstimmungEinfacheMehrheit($id,$mysqli);
                                 $wahlErfolgreich = 1; 
                                 break;
@@ -1318,16 +1397,23 @@ p#liste {
                             $wahlID = (int)$_POST['dorfWahlID'];
                             $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = $wahlID WHERE id = $eigeneID");
                             //Dann schauen, ob wir schon eine Mehrheit haben
+                            $text = "";
                             $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                             $anzahlSpieler = $alleSpielerRes->num_rows;
                             while ($temp = $alleSpielerRes->fetch_assoc())
                             {
-                              if (!isset($wahlAufSpieler[$temp['wahlAuf']]))
-                                $wahlAufSpieler[$temp['wahlAuf']] = 0;
-                              $wahlAufSpieler[$temp['wahlAuf']]+=1;
+                              $w = $temp['wahlAuf'];
+                              if (!isset($wahlAufSpieler[$w]))
+                                $wahlAufSpieler[$w] = 0;
+                              $wahlAufSpieler[$w]+=1;
                               //Falls es der Bürgermeister ist, zusätzliche 1/2 Stimme
                               if ($temp['buergermeister']==1)
-                                $wahlAufSpieler[$temp['wahlAuf']]+=0.5;
+                                $wahlAufSpieler[$w]+=0.5;
+                              if ($w > -1)
+                              {
+                                  $text .= $temp['name']." -> ". getName($mysqli,$w). ", "; 
+                              }
+                              
                             }
                             //Schauen, ob jemand mehr als 50% der Stimmen hat
                             foreach ($wahlAufSpieler as $id => $stimmen)
@@ -1336,8 +1422,8 @@ p#liste {
                               {
                                 //Dieser Spieler hat die Mehrheit
                                 $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1");
-                                toGameLog($mysqli,getName($mysqli,$id)." wurde bei der Abstimmung zum Tode verurteilt");
-                                toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde vom Dorf zum Tode verurteilt");
+                                toGameLog($mysqli,getName($mysqli,$id)." wurde bei der Abstimmung zum Tode verurteilt, Stimmen: $text");
+                                toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde vom Dorf zum Tode verurteilt, Stimmen: $text");
                                 endeDerStichwahl($id,$mysqli); 
                                 break;
                               }
@@ -1452,10 +1538,12 @@ p#liste {
                       `verliebtMit` INT ( 5 ) DEFAULT -1 ,
                       `jaegerDarfSchiessen` INT (2) DEFAULT 0 ,
                       `buergermeisterDarfWeitergeben` INT (2) DEFAULT 0 ,
+                      `urwolf_anzahl_faehigkeiten` INT ( 5 ) DEFAULT 0,
                       `dieseNachtGestorben` INT (2) DEFAULT 0 ,
                       `countdownBis` INT (10) DEFAULT 0 ,
                       `countdownAb` INT (10) DEFAULT 0 ,
                       `playerlog` LONGTEXT ,
+                      `popup_text` TEXT ,
                       `bereit` INT (2) NULL ,
                       `reload` INT (2) NULL ,
                       `verifizierungsnr` INT ( 5 ) DEFAULT 0
@@ -1487,6 +1575,7 @@ p#liste {
                       `idiotenzahl` INT ( 5 ) DEFAULT 0 ,
                       `pazifistenzahl` INT ( 5 ) DEFAULT 0 ,
                       `altenzahl` INT ( 5 ) DEFAULT 0 ,
+                      `urwolfzahl` INT ( 5 ) DEFAULT 0 ,
                       `zufaelligeAuswahl` INT ( 2 ) DEFAULT 0 ,
                       `zufaelligeAuswahlBonus` INT ( 5 ) DEFAULT 0 ,
                       `werwolfeinstimmig` INT ( 2 ) DEFAULT 1 ,
@@ -1629,14 +1718,36 @@ p#liste {
       {
         //Wenn ja, zeige Logbutton an
         playerLogButton($mysqli);
+        //Der Spielleiter sollte die Möglichkeit bekommen, einen Spieler aus dem Spiel zu werfen (weil z.B. inaktiv)
+        if (isset($eigeneID) && isset($spielID))
+        {
+          $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID AND spielleiter = 1");
+          if ($res->num_rows > 0)
+          {
+              echo "<p align='center' ><input type='submit' value='Spieler entfernen' onClick='showRemovePlayerForm()'></p>";
+              echo "<div id='sl_entfernen' style='display: none;'><hr>";
+              $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
+              while ($a = $res->fetch_assoc())
+              {
+                  echo "<form action='Werwolf.php' method='post'>";
+                  echo "<input type='hidden' name='entfernenID' value = ".$a['id'].">";
+                  echo "<input type='hidden' name='spieler_entfernen' value = 1>";
+                  echo "<p id='normal' align='center'>".$a['name'];
+                  echo"<input type='submit' value='entfernen' onClick='if (confirm(\"Wirklich diesen Spieler entfernen? Sie sollten das nur tun, wenn er inaktiv ist!\")==false){return false;}'></p>";
+                  echo "</form>";
+              }                                                                       
+              echo "<hr></div>";   
+          }
+        }
       }
+      
 ?>
-<hr>
-<br>v1.0.5, Erstellt von Florian Lindenbauer
-<br>
 <form action="Werwolf.php" method="post">
   <p id = 'normal' align = "center">Löst oft viele Probleme: <input type="submit" value = "Reload" /></p>
 </form>
+<hr>
+<br>v1.1.0, Erstellt von Florian Lindenbauer
+<br>
 <br>
 <?php
 local_settings();
@@ -1682,7 +1793,7 @@ var sekBisTimerBeginn;
          if (xmlhttp.responseText == "1")
          {
             setTimeout(self.location.href="Werwolf.php",1); 
-         }
+         }                                                                                                                  
          else
          {
             setTimeout(reloadmaintain,3500,game,id);
@@ -1825,6 +1936,18 @@ var sekBisTimerBeginn;
       form.style.display = "block";
       gameLogRefresh(game);
       refreshGameLog = 1;
+    }
+  }
+  function showRemovePlayerForm()
+  {
+    var form = document.getElementById("sl_entfernen");
+    if (form.style.display == "block")
+    {
+      form.style.display = "none";
+    }
+    else
+    {
+      form.style.display = "block";
     }
   }
   
@@ -2166,6 +2289,7 @@ function spielRegeln($mysqli)
   $idiotenzahl = $gameResAssoc['idiotenzahl'];
   $pazifistenzahl = $gameResAssoc['pazifistenzahl'];
   $altenzahl = $gameResAssoc['altenzahl'];
+  $urwolfzahl = $gameResAssoc['urwolfzahl'];
   $werwolftimer1 = $gameResAssoc['werwolftimer1'];
   $werwolfzusatz1 = $gameResAssoc['werwolfzusatz1'];
   $werwolftimer2 = $gameResAssoc['werwolftimer2'];
@@ -2238,6 +2362,9 @@ function spielRegeln($mysqli)
    echo "<p id='normal' align='center'>Die Alten: <INPUT TYPE='number'   NAME='alten' Size='2' value=$altenzahl MIN=0>
     <INPUT TYPE='button' VALUE='+' OnClick='auswahl.alten.value=parseInt(auswahl.alten.value) + 1; '>
     <INPUT TYPE='button' VALUE='-' OnClick='auswahl.alten.value -=1 '></p>";
+  echo "<p id='normal' align='center'>Urwolf / Urwölfin: <INPUT TYPE='number'   NAME='urwolf' Size='2' value=$urwolfzahl MIN=0>
+    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.urwolf.value=parseInt(auswahl.urwolf.value) + 1; '>
+    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.urwolf.value -=1 '></p>";
   echo "<p id='normal' align='center'>Amor: <INPUT TYPE='number'   NAME='amor' Size='2' value=$amorzahl MIN=0 MAX=1>
     <INPUT TYPE='button' VALUE='1' OnClick='auswahl.amor.value=1; '>
     <INPUT TYPE='button' VALUE='0' OnClick='auswahl.amor.value=0; '></p>";
@@ -2291,6 +2418,7 @@ function spielRegelnAnwenden($mysqli)
     $idiotenzahl = (int)$_POST['idioten'];
     $pazifistenzahl = (int)$_POST['pazifisten'];
     $altenzahl = (int)$_POST['alten'];
+    $urwolfzahl = (int)$_POST['urwolf'];
     $werwolftimer1 = (int)$_POST['werwolftimer1'];
     $werwolfzusatz1 = (int)$_POST['werwolfzusatz1'];
     $werwolftimer2 = (int)$_POST['werwolftimer2'];
@@ -2345,6 +2473,7 @@ function spielRegelnAnwenden($mysqli)
      idiotenzahl = $idiotenzahl,
      pazifistenzahl = $pazifistenzahl,
      altenzahl = $altenzahl,
+     urwolfzahl = $urwolfzahl,
      zufaelligeAuswahl = $zufaelligauswaehlen,
      zufaelligeAuswahlBonus = $zufaelligeAuswahlBonus,
      werwolftimer1 = $werwolftimer1,
@@ -2382,12 +2511,13 @@ function spielInitialisieren($mysqli,$spielerzahl)
   $idiotenzahl = $gameResAssoc['idiotenzahl'];
   $pazifistenzahl = $gameResAssoc['pazifistenzahl'];
   $altenzahl = $gameResAssoc['altenzahl'];
+  $urwolfzahl = $gameResAssoc['urwolfzahl'];
   $zufaelligeAuswahl = $gameResAssoc['zufaelligeAuswahl'];
   $zufaelligeAuswahlBonus = $gameResAssoc['zufaelligeAuswahlBonus'];
   
   //Zähle alle Charaktere zusammen und schaue, ob es mehr als die Spieleranzahl sind
   $besondereCharaktere = $werwolfzahl + $hexenzahl + $jaegerzahl + $seherzahl + $amorzahl + $beschuetzerzahl + $parErmZahl
-    + $lykantrophenzahl + $spionezahl + $idiotenzahl + $pazifistenzahl + $altenzahl;
+    + $lykantrophenzahl + $spionezahl + $idiotenzahl + $pazifistenzahl + $altenzahl + $urwolfzahl;
   if ($besondereCharaktere > $spielerzahl && $zufaelligeAuswahl == 0)
   {
     echo "<p id='error' align='center'>Nicht genug Spieler für Ihre Spielkonfiguration</p>";
@@ -2395,7 +2525,7 @@ function spielInitialisieren($mysqli,$spielerzahl)
   }
   
   //Schau, ob es zumindest einen "bösen" Charakter gibt...
-  $boeseCharaktere = $werwolfzahl;
+  $boeseCharaktere = $werwolfzahl + $urwolfzahl;
   if ($boeseCharaktere < 1 && $zufaelligeAuswahl == 0)
   {
     echo "<p id='error' align='center'>Ein Spiel mit dieser Konfiguration ist nicht möglich. Haben Sie mindestens einen Werwolf ausgewählt?</p>";
@@ -2469,12 +2599,13 @@ function spielStarten($mysqli)
   $idiotenzahl = $gameResAssoc['idiotenzahl'];
   $pazifistenzahl = $gameResAssoc['pazifistenzahl'];
   $altenzahl = $gameResAssoc['altenzahl'];
+  $urwolfzahl = $gameResAssoc['urwolfzahl'];
   $zufaelligeAuswahl = $gameResAssoc['zufaelligeAuswahl'];
   $zufaelligeAuswahlBonus = $gameResAssoc['zufaelligeAuswahlBonus'];
   
   //Zähle alle Charaktere zusammen und schaue, ob es mehr als die Spieleranzahl sind
   $besondereCharaktere = $werwolfzahl + $hexenzahl + $jaegerzahl + $seherzahl + $amorzahl + $beschuetzerzahl + $parErmZahl
-    + $lykantrophenzahl + $spionezahl + $idiotenzahl + $pazifistenzahl + $altenzahl;
+    + $lykantrophenzahl + $spionezahl + $idiotenzahl + $pazifistenzahl + $altenzahl + $urwolfzahl;
   if (($besondereCharaktere > $spielerzahl && $zufaelligeAuswahl == 0)|| $spielerzahl < 2)
   {
     echo "<p id='error' align='center'>Nicht genug Spieler für Ihre Spielkonfiguration</p>";
@@ -2485,7 +2616,7 @@ function spielStarten($mysqli)
   }
   
   //Schau, ob es zumindest einen "bösen" Charakter gibt...
-  $boeseCharaktere = $werwolfzahl;
+  $boeseCharaktere = $werwolfzahl + $urwolfzahl;
   if ($boeseCharaktere < 1 && $zufaelligeAuswahl == 0)
   {
     echo "<p id='error' align='center'>Ein Spiel mit dieser Konfiguration ist nicht möglich. Haben Sie mindestens einen Werwolf ausgewählt?</p>";
@@ -2518,7 +2649,7 @@ function spielStarten($mysqli)
     toGameLog($mysqli,"Ein neues Spiel wird gestartet mit $spielerzahl Spielern. Die Charaktere werden zufällig verteilt.");
     $spielinfo = "Maximal im Spiel: Werwölfe: $spielerzahl, Hexen: $hexenzahl, Seher: $seherzahl, Jäger: $jaegerzahl, Amor: $amorzahl, 
       Beschützer: $beschuetzerzahl, Paranormaler Ermittler: $parErmZahl, Lykantrophen: $lykantrophenzahl,
-      Spione: $spionezahl, Mordlustige: $idiotenzahl, Pazifisten: $pazifistenzahl, Die Alten: $altenzahl";
+      Spione: $spionezahl, Mordlustige: $idiotenzahl, Pazifisten: $pazifistenzahl, Die Alten: $altenzahl, Urwölfe: $urwolfzahl";
     toGameLog($mysqli,$spielinfo);
     toAllPlayerLog($mysqli,"Ein neues Spiel wird gestartet mit $spielerzahl Spielern. Die Charaktere werden zufällig verteilt.");
     toAllPlayerLog($mysqli,$spielinfo); 
@@ -2538,6 +2669,7 @@ function spielStarten($mysqli)
     $idiotenbonus = +1;
     $pazifistenbonus = -1;
     $altenbonus = 0;
+    $urwolfbonus = -8;
     $dorfbewohnerbonus = +1;
     for ($i=0;$i<=1000;$i++)
     {
@@ -2554,10 +2686,11 @@ function spielStarten($mysqli)
       $idiotenzahlN = rand(0,$idiotenzahl);
       $pazifistenzahlN = rand(0,$pazifistenzahl);
       $altenzahlN = rand(0,$altenzahl);
+      $urwolfzahlN = rand(0, $urwolfzahl);
       
       $dorfbewohnerzahlN = $spielerzahl - $werwolfzahlN - $hexenzahlN - $jaegerzahlN - $seherzahlN
         - $amorzahlN - $beschuetzerzahlN - $parErmZahlN - $lykantrophenzahlN - $spionezahlN
-        - $idiotenzahlN - $pazifistenzahlN - $altenzahlN;
+        - $idiotenzahlN - $pazifistenzahlN - $altenzahlN - $urwolfzahlN;
       //Jetzt überprüfe, ob die Aufteilung "fair ist"
       $aktBonus = $werwolfzahlN * $werwolfbonus
         + $hexenzahlN * $hexenbonus
@@ -2571,6 +2704,7 @@ function spielStarten($mysqli)
         + $idiotenzahlN * $idiotenbonus
         + $pazifistenzahlN * $pazifistenbonus
         + $altenzahlN * $altenbonus
+        + $urwolfzahlN * $urwolfbonus
         + $dorfbewohnerzahlN * $dorfbewohnerbonus;
       if ($aktBonus + 1 <= $zufaelligeAuswahlBonus + 2 && $aktBonus + 1 >= $zufaelligeAuswahlBonus && $dorfbewohnerzahlN >= 0)
       {
@@ -2588,6 +2722,7 @@ function spielStarten($mysqli)
         $idiotenzahl = $idiotenzahlN;
         $pazifistenzahl = $pazifistenzahlN;
         $altenzahl = $altenzahlN;
+        $urwolfzahl = $urwolfzahlN;
         break;
       }
     }
@@ -2608,10 +2743,11 @@ function spielStarten($mysqli)
       $idiotenzahl = 0;
       $pazifistenzahl = 0;
       $altenzahl = 0;
+      $urwolfzahl = 0;
     }
     $spielinfo = "Im Spiel befinden sich: Werwölfe: $werwolfzahl, Hexen: $hexenzahl, Seher: $seherzahl, Jäger: $jaegerzahl, Amor: $amorzahl, 
       Beschützer: $beschuetzerzahl, Paranormaler Ermittler: $parErmZahl, Lykantrophen: $lykantrophenzahl,
-      Spione: $spionezahl, Mordlustige: $idiotenzahl, Pazifisten: $pazifistenzahl, Die Alten: $altenzahl";
+      Spione: $spionezahl, Mordlustige: $idiotenzahl, Pazifisten: $pazifistenzahl, Die Alten: $altenzahl, Urwölfe: $urwolfzahl";
     toGameLog($mysqli,$spielinfo);
   }
   else
@@ -2620,7 +2756,7 @@ function spielStarten($mysqli)
     toGameLog($mysqli,"Ein neues Spiel wird gestartet mit $spielerzahl Spielern.");
     $spielinfo = "Werwölfe: $werwolfzahl, Hexen: $hexenzahl, Seher: $seherzahl, Jäger: $jaegerzahl, Amor: $amorzahl, 
       Beschützer: $beschuetzerzahl, Paranormaler Ermittler: $parErmZahl, Lykantrophen: $lykantrophenzahl,
-      Spione: $spionezahl, Mordlustige: $idiotenzahl, Pazifisten: $pazifistenzahl, Die Alten: $altenzahl";
+      Spione: $spionezahl, Mordlustige: $idiotenzahl, Pazifisten: $pazifistenzahl, Die Alten: $altenzahl, Urwölfe: $urwolfzahl";
     toGameLog($mysqli,$spielinfo);
     toAllPlayerLog($mysqli,"Ein neues Spiel wird gestartet mit $spielerzahl Spielern.");
     toAllPlayerLog($mysqli,$spielinfo);
@@ -2639,6 +2775,7 @@ function spielStarten($mysqli)
   weiseCharakterZu($idiotenzahl,CHARMORDLUSTIGER,$mysqli);
   weiseCharakterZu($pazifistenzahl,CHARPAZIFIST,$mysqli);
   weiseCharakterZu($altenzahl,CHARALTERMANN,$mysqli);
+  weiseCharakterZu($urwolfzahl, CHARURWOLF, $mysqli);
   
   //setze verschiedene Startwerte:
   //Bei allen Hexen setze die Heiltränke und Todestränke auf 1
@@ -2665,6 +2802,10 @@ function spielStarten($mysqli)
     {
       //Weise dem Spieler Dorfbewohner zu!
       $mysqli->Query("UPDATE $spielID"."_spieler SET nachtIdentitaet = ". CHARDORFBEWOHNER ." WHERE id = $i");
+    }
+    elseif ($temp['nachtIdentitaet'] == CHARURWOLF)
+    {
+      $mysqli->Query("UPDATE $spielID"."_spieler SET urwolf_anzahl_faehigkeiten = 1 WHERE id = $i");    
     }
   }
   $neuePhase = PHASENACHT3;
@@ -2728,7 +2869,7 @@ function phaseInitialisieren($phase,$mysqli)
     $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = -1");
     $gameAssoc = gameAssoc($mysqli);
     //Bei weniger als 2 Werwölfen kann werwolfeinstimmig gleich auf 0 gesetzt werden.
-    $werwolfQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE nachtIdentitaet = ". CHARWERWOLF ." AND lebt = 1");
+    $werwolfQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ".CHARURWOLF.") AND lebt = 1");
     $werwolfzahl = $werwolfQ->num_rows;
     if ($werwolfzahl > 2)
     {
@@ -2738,7 +2879,7 @@ function phaseInitialisieren($phase,$mysqli)
         $countdownAb = time()+20;
       else
         $countdownAb = time();
-      $mysqli->Query("UPDATE $spielID"."_spieler SET countdownBis = $countdownBis, countdownAb = $countdownAb WHERE nachtIdentitaet = ".CHARWERWOLF);
+      $mysqli->Query("UPDATE $spielID"."_spieler SET countdownBis = $countdownBis, countdownAb = $countdownAb WHERE (nachtIdentitaet = ".CHARWERWOLF." OR nachtIdentitaet = ".CHARURWOLF.")");
     }
     else
     {
@@ -2748,7 +2889,7 @@ function phaseInitialisieren($phase,$mysqli)
         $countdownAb = time()+5;
       else
         $countdownAb = time();
-      $mysqli->Query("UPDATE $spielID"."_spieler SET countdownBis = $countdownBis, countdownAb = $countdownAb WHERE nachtIdentitaet = ".CHARWERWOLF);
+      $mysqli->Query("UPDATE $spielID"."_spieler SET countdownBis = $countdownBis, countdownAb = $countdownAb WHERE (nachtIdentitaet = ".CHARWERWOLF." OR nachtIdentitaet = ".CHARURWOLF.")");
     }
     
   }
@@ -3071,6 +3212,7 @@ function spionSehe($mysqli, $id, $identitaet)
 {
   $spielID = $_COOKIE['SpielID'];
   $eigeneID = $_COOKIE['eigeneID'];
+  $id = (int)$id;
   //schauen, ob es ein valider Spieler ist
   $spielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $id AND lebt = 1");
   if ($spielerRes->num_rows < 1)
@@ -3094,6 +3236,72 @@ function spionSehe($mysqli, $id, $identitaet)
   //Setze mich noch auf bereit ;)
   $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1 WHERE id = $eigeneID");
   return true;
+}
+
+function urwolfInitialisiere($mysqli)
+{
+  $spielID = $_COOKIE['SpielID'];
+  
+  //Zeige eine Liste aller lebenden Spieler an
+  echo "<form action='Werwolf.php' method='post'>";
+  echo '<input type="hidden" name="urwolfHatAusgewaehlt" value=1 />';
+  echo "<p id='normal' align='center'>Sie als Urwolf/Urwölfin können einmal im Spiel einen anderen Spieler zum Werwolf machen. Wen wollen Sie wählen?<br>
+  Wenn Sie niemanden zum Werwolf machen wollen, wählen sie 'Niemand' aus</p>";
+  echo "<p align='center'><select name = 'urwolfID' size = 1>";
+  echo "<option value = '-1'>Niemand</option>";
+  $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
+  while ($temp = $alleSpielerRes->fetch_assoc())
+  {
+    echo "<option value = '".$temp['id']."'>".$temp['name']."</option>";
+  }
+  echo '</select></p><p id = "normal" align = "center"><input type="submit" value = "Diesen Spieler zum Werwolf machen"/></p></form>';
+}
+
+function urwolfHandle($mysqli, $id)
+{
+ 
+  $spielID = $_COOKIE['SpielID'];
+  $eigeneID = $_COOKIE['eigeneID'];
+  if ($id == -1)
+  {
+    $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1 WHERE id = $eigeneID");
+    return true; //NIEMAND
+  }
+  if ($mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID")->fetch_assoc()['urwolf_anzahl_faehigkeiten'] > 0)
+  {
+    //schauen, ob es ein valider Spieler ist
+    $stmt = $mysqli->prepare("SELECT * FROM $spielID"."_spieler WHERE id = ? AND lebt = 1");
+    $stmt->bind_param('i',$id);
+    $stmt->execute();
+    $spielerRes = $stmt->get_result();
+    if ($spielerRes->num_rows < 1)
+      return false;
+    $spielerAssoc=$spielerRes->fetch_assoc();
+    $identitaet = $spielerAssoc['nachtIdentitaet'];
+    $strIdentitaet = nachtidentitaetAlsString($identitaet);
+    
+    $text = $spielerAssoc['name']." ist jetzt ein Werwolf!";
+    $stmt->close();
+    echo "<h1 align='center'>$text</h1>";
+    
+    //Schreibe es auch ins playerlog, damit es der Spieler nachlesen kann
+    toPlayerLog($mysqli, $text, $eigeneID);
+    toPlayerLog($mysqli, "Sie wurden vom Urwolf/von der Urwölfin zu einem Werwolf gemacht. Sie verlieren alle bisherigen Fähigkeiten und spielen nun für die Werwölfe! Viel Erfolg!", $id);
+    toGameLog($mysqli,getName($mysqli,$eigeneID)."(Urwolf/Urwölfin)  macht ".$spielerAssoc['name']."($strIdentitaet) zum Werwolf.");
+    
+    $stmt = $mysqli->prepare("UPDATE $spielID"."_spieler SET nachtIdentitaet = ". CHARWERWOLF .", popup_text = 'Du wurdest vom Urwolf / von der Urwölfin zu einem Werwolf gemacht und spielst jetzt für die Werwölfe!' WHERE id = ?");
+    $stmt->bind_param('i',$id);
+    $stmt->execute();
+    $stmt->close();
+    
+    //Setze mich noch auf bereit ;)
+    $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, urwolf_anzahl_faehigkeiten = 0 WHERE id = $eigeneID");
+    return true;
+   }
+   else
+   {
+        return false;
+   }
 }
 
 function seherInitialisiere($mysqli)
@@ -3541,13 +3749,13 @@ function writeGameToLog($mysqli)
   fwrite($myfile,$mitUmbruch);
   
   //Schreibe noch die Überlebenden
-  fwrite("/n Die Überlebenden: /n");
+  fwrite($myfile,"Die Überlebenden:\n");
   $lebendQuery = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $lebendQuery->fetch_assoc())
   {
-    fwrite($temp['name']."(".nachtidentitaetAlsString($temp['nachtIdentitaet'],$mysqli).")/n");
+    fwrite($myfile,$temp['name']."(".nachtidentitaetAlsString($temp['nachtIdentitaet'],$mysqli).")\n");
   }
-  fwrite("--- ENDE DES SPIELLOGS ---/n");
+  fwrite($myfile,"--- ENDE DES SPIELLOGS ---\n");
   fclose($myfile);
 }
 
@@ -3573,11 +3781,11 @@ function checkeSiegbedingungen($mysqli)
   
   
   //Schaue, ob es keine Werwölfe mehr gibt
-  $werwoelfeRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND nachtIdentitaet = ".CHARWERWOLF);
+  $werwoelfeRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND (nachtIdentitaet = ".CHARWERWOLF. " OR nachtIdentitaet = ".CHARURWOLF.")");
   if ($werwoelfeRes->num_rows > 0)
   {
     //Es gibt noch Werwölfe, schaue, ob sie gewonnen haben
-    $dorfbewohnerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND nachtIdentitaet <> ".CHARWERWOLF);
+    $dorfbewohnerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND nachtIdentitaet <> ".CHARWERWOLF. " AND nachtIdentitaet <> ".CHARURWOLF);
     if ($dorfbewohnerRes->num_rows <= 0)
     {
       //Die Werwölfe haben gewonnen ...
@@ -3642,6 +3850,12 @@ function diesesSpielLoeschenButton()
     </form>
     <?php
 }
+function aus_spiel_entfernen($spielerID, $mysqli)
+{
+  $spielID = $_COOKIE['SpielID'];
+  $spielerID = (int)$spielerID;
+  $mysqli->Query("UPDATE $spielID"."_spieler SET lebt = 0 WHERE id = $spielerID");   
+}
 
 function alleReloadAusser($spielerID,$mysqli)
 {
@@ -3695,7 +3909,7 @@ function getName($mysqli, $spielerID)
 
 function getGesinnung($identitaet)
 {
-  if ($identitaet == CHARWERWOLF)
+  if ($identitaet == CHARWERWOLF || $identitaet == CHARURWOLF)
     return "Werwölfe";
   else
     return "Dorfbewohner";
@@ -3746,6 +3960,9 @@ function nachtidentitaetAlsString($identitaet)
       break;
     case CHARALTERMANN:
       return "Die/Der Alte";
+      break;
+    case CHARURWOLF:
+      return "Urwolf/Urwölfin";
       break;
     default:
       return "";
@@ -3807,6 +4024,9 @@ function nachtidentitaetKurzerklaerung($identitaet)
       break;
     case CHARALTERMANN:
       return "Sie sterben in der x. Nacht, wobei x die Anzahl der lebenden Werwölfe + 1 ist. Es kann also sein, dass sie früher sterben als gedacht ...";
+      break;
+    case CHARURWOLF:
+      return "Sie gehören zu den Werwölfen und gewinnen bzw. verlieren mit ihnen. Einmal pro Spiel können Sie einen Spieler zum Werwolf machen, der dann alle bisherigen Fähigkeiten verliert ...";
       break;
   }
 }
@@ -3878,7 +4098,7 @@ function characterButton($mysqli)
 function getDorfbewohnerText()
 {
   //Liefert verschiedene Texte zurück, die angezeigt werden, wenn der Weiterschlafen button aktiv wird
-  $i = rand(0,19);
+  $i = rand(0,20);
   $text = "";
   switch($i)
   {
@@ -3956,6 +4176,9 @@ function getDorfbewohnerText()
       break;
     case 17:
       $text = "Die/Der Alte stirbt im Laufe des Spiels, und zwar abhängig davon, wie viele Werwölfe noch am Leben sind.";
+      break;
+    case 18:
+      $text = "Der Urwolf / Die Urwölfin spielt gemeinsam mit den Werwölfen, kann aber einmal im Spiel einen Spieler zum Werwolf machen, der daraufhin alle seine bisherigen Fähigkeiten verliert.";
       break;
     default:
       $text = "Ein dunkler Schatten hat sich über das Dorf gelegt. Beunruhigt und verängstigt versuchen die übrig gebliebenen Dorfbewohner
