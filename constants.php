@@ -36,4 +36,5 @@ define ("CHARSPION",10);
 define ("CHARMORDLUSTIGER",11);
 define ("CHARPAZIFIST",12);
 define ("CHARALTERMANN",13);
+define ("CHARURWOLF",14);
 ?>
