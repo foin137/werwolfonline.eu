@@ -7,6 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta http-equiv="Expires" content="Sat, 01 Dec 2001 00:00:00 GMT">
+<link rel="stylesheet" type="text/css" href="style.css">
 <?php
 //Für die Farben ...
 if (isset($_POST['settings_color']))
@@ -41,48 +42,49 @@ if (isset($_COOKIE['back_color_n_r']) && isset ($_COOKIE['back_color_n_g']) && i
     }
     catch(Exception $e)
     {
-      $c_p_r = 0;//= "#00AA00";
-      $c_p_g = 170;
-      $c_p_b = 0;
-      $c_back_n_r = 64;// = "#404050";
-      $c_back_n_g = 64;
-      $c_back_n_b = 80;
-      $c_back_d_r =187;//= "#BBAA80";
-      $c_back_d_g = 170;
-      $c_back_d_b = 128;
-      $c_n_r = 49; //= "#3162dd";
-      $c_n_g = 98;
-      $c_n_b = 221;
+      $c_p_r = 181;//= "#00AA00";
+      $c_p_g = 33;
+      $c_p_b = 76;
+      $c_back_n_r = 60;// = "#404050";
+      $c_back_n_g = 60;
+      $c_back_n_b = 60;
+      $c_back_d_r = 199;//= "#BBAA80";
+      $c_back_d_g = 194;
+      $c_back_d_b = 149;
+      $c_n_r = 86; //= "#3162dd";
+      $c_n_g = 132;
+      $c_n_b = 247;
     }
 }
 else
 {
-    $c_p_r = 0;//= "#00AA00";
-      $c_p_g = 170;
-      $c_p_b = 0;
-      $c_back_n_r = 64;// = "#404050";
-      $c_back_n_g = 64;
-      $c_back_n_b = 80;
-      $c_back_d_r =187;//= "#BBAA80";
-      $c_back_d_g = 170;
-      $c_back_d_b = 128;
-      $c_n_r = 49; //= "#3162dd";
-      $c_n_g = 98;
-      $c_n_b = 221;
+    $c_p_r = 181;//= "#00AA00";
+      $c_p_g = 33;
+      $c_p_b = 76;
+      $c_back_n_r = 60;// = "#404050";
+      $c_back_n_g = 60;
+      $c_back_n_b = 60;
+      $c_back_d_r =199;//= "#BBAA80";
+      $c_back_d_g = 194;
+      $c_back_d_b = 149;
+      $c_n_r = 86; //= "#3162dd";
+      $c_n_g = 132;
+      $c_n_b = 247;
 }
 
 ?>
 <style type="text/css">
- body {background-color:<?php echo "rgb($c_back_n_r,$c_back_n_g,$c_back_n_b)"; ?>}
- p {
+ #gameboard {background-color:<?php echo "rgb($c_back_n_r,$c_back_n_g,$c_back_n_b)"; ?>}
+
+ h3 {
     color:<?php echo "rgb($c_p_r,$c_p_g,$c_p_b)"; ?>;
     font-size:150%;
  }
-p#normal {
+p {
     color:<?php echo "rgb($c_n_r,$c_n_g,$c_n_b)"; ?>;
     font-size:100%;
 }
-p#error {
+p.error {
     color:red;
     font-size:100%;
 }
@@ -92,17 +94,15 @@ p#liste {
     line-height:1.2;
     margin:0;
 }
- h1 {
-    color:blue;
-    font-family:verdana;
-    font-size:300%;
-}
+
 </style>
 <link rel="SHORTCUT ICON" href="images/icon.ico" type="image/x-icon">
 </head>
 <body onload="jsstart();">
-<p align='Center'>Werwolfonline.eu</p>
-<hr>
+<section id="header">
+<h1>Werwolfonline.eu</h1>
+</section>
+<section id="gameboard">
 <?php
   include "includes.php"; //Datenbank
   include "constants.php"; //Hier werden Konstanten für Phasen und Charaktere definiert
@@ -155,9 +155,9 @@ p#liste {
                 
                 //Dass wir aber nicht ohne Grund reloaden, setzen wir für uns selbst reload auf false:
                 setReloadZero($eigeneID,$mysqli);
-                //echo "<p algin='center' id='normal'>Du befindest dich bereits in einem Spiel, Name: ".getName($mysqli,$eigeneID)."</p>";
+                //echo "<p algin='center' class='normal'>Du befindest dich bereits in einem Spiel, Name: ".getName($mysqli,$eigeneID)."</p>";
                 $myname = getName($mysqli,$eigeneID);
-                echo "<p id='normal' align='center'>Name: ". $myname ."</p>";
+                echo "<div id='playername'><p class='normal' >Name: ". $myname ."</p></div>";
                 
                 //Nachschauen, ob ich Bürgermeister bin ... Dann nämlich anschreiben ...
                 $buergermRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE buergermeister = 1");
@@ -167,7 +167,7 @@ p#liste {
                   if ($buergermAss['id']==$eigeneID)
                   {
                     //Ich bin Bürgermeister
-                    echo "<p align='center' id='normal'>Sie sind Bürgermeister</p>";
+                    echo "<p  class='normal'>Sie sind Bürgermeister</p>";
                   }
                 }
                 
@@ -205,8 +205,8 @@ p#liste {
                   }
                   else
                   {
-                    echo "<p align='center'>Der Jäger wurde getötet</p>";
-                    echo "<p id='normal' align='center'>Warten auf Jäger</p>";
+                    echo "<p >Der Jäger wurde getötet</p>";
+                    echo "<p class='normal' >Warten auf Jäger</p>";
                     $pageReload = true;
                   }
                 }
@@ -237,8 +237,8 @@ p#liste {
                     }
                     else
                     {
-                      echo "<p align='center'>Der Bürgermeister wurde getötet</p>";
-                      echo "<p id='normal' align='center'>Er darf sein Amt weitergeben</p>";
+                      echo "<p >Der Bürgermeister wurde getötet</p>";
+                      echo "<p class='normal' >Er darf sein Amt weitergeben</p>";
                       $pageReload = true;
                     }
                   }
@@ -298,7 +298,7 @@ p#liste {
                             spielRegelnAnwenden($mysqli);
                           
                           //Phase 0 = Setup und Spielersuchen -> Zeige daher eine Liste der Spieler an
-                          echo "<BR><h1 align = 'center'>$spielID</h1><BR><p id='normal' align='center'>Mit dieser Zahl können andere Ihrem Spiel beitreten!</p>";
+                          echo "<BR><h2>$spielID</h2><BR><p class='normal' >Mit dieser Zahl können andere Ihrem Spiel beitreten!</p>";
                           
                           //Der Spielleiter bekommt zusätzlich einen Button angezeigt, mit dem er die Einstellungen bearbeiten kann.
                           $eigRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID");
@@ -307,24 +307,24 @@ p#liste {
                           {
                             echo '<form action="Werwolf.php" method="post">
                             <input type="hidden" name="spielEditieren" value=1 />
-                            <p id="normal" align="center">Sie als Spielleiter erhalten die Möglichkeit, die Regeln des Spiels zu bearbeiten:
+                            <p class="normal" align="center">Sie als Spielleiter erhalten die Möglichkeit, die Regeln des Spiels zu bearbeiten:
                             <input type="submit" value = "Regeln bearbeiten"/></p>
                             </form>
                             <form action="Werwolf.php" method="post">
                             <input type="hidden" name="spielStarten" value=1 />
-                            <p id="normal" align="center">
+                            <p class="normal" align="center">
                             <input type="submit" value = "Spiel starten ;)"/></p>
                             </form>';
                           }
                           
                           //Zeige alle Spieler in einer Liste an--> Alt, wird jz via javascript gelöst
-                          echo "<BR><p align='center'>Spieler in diesem Spiel:</p>";
+                          echo "<BR><h3>Spieler in diesem Spiel:</h3>";
                           $spieleranzahlQuery = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
                           $spielerzahl = $spieleranzahlQuery->num_rows; //und zähle mit
                           //Die Liste wird mit Javascript erstellt
                           echo "<form name='list'><div id='listdiv'></div></form>";
                           $listReload = true; //Dass unsere Liste refresht wird ;)
-                          echo "<p align='center'>Spieleranzahl: $spielerzahl</p>";
+                          echo "<h3 >Spieleranzahl: $spielerzahl</h3>";
                           
                           //Falls der Spielleiter das Spiel beginnenlassen will:
                           if (isset($_POST['spielStarten']))
@@ -344,8 +344,8 @@ p#liste {
                           //Zeige Formular zum Klicken auf bereit
                           echo '<form action="Werwolf.php" method="post">
                             <input type="hidden" name="bereit" value=1 />
-                            <p id="normal" align = "center">Drücke "bereit", um zu starten!</p>
-                            <p id="normal" align="center">
+                            <p class="normal" align = "center">Drücke "bereit", um zu starten!</p>
+                            <p class="normal" align="center">
                             <input type="submit" value = "bereit"/></p>
                             </form>';
                         }
@@ -377,14 +377,14 @@ p#liste {
                           //Diese Liste wird mit javascript erstellt
                           echo "<form name='list'><div id='listdiv'></div></form>";
                           $listReload = true; //Dass unsere Liste refresht wird
-                          echo ("<p align='center'>Warte auf andere Spieler ...</p>");
+                          echo ("<p >Warte auf andere Spieler ...</p>");
                           
                           //Als Spielleiter sollte man das Spiel "ohne Rücksicht auf Verluste" beginnen können
                           if ($eigeneID == 0)
                           {
                             ?><form action="Werwolf.php" method="post">
                               <input type="hidden" name="spielBeginnenOhneRuecksicht" value=1 />
-                              <p id="normal" align="center">
+                              <p class="normal" align="center">
                               <input type="submit" value = "Spiel beginnen ohne zu warten" onClick="if (confirm('Wollen Sie das Spiel wirklich starten, ohne auf alle zu warten. Wer noch nicht bereit ist, wird aus dem Spiel gelöscht')==false){return false;}"/></p>
                             </form> 
                               <?php
@@ -393,7 +393,7 @@ p#liste {
                       }
                       elseif ($phase == PHASENACHTBEGINN)
                       {
-                        echo "<p align='center'>Die Nacht bricht herein ...</p>";
+                        echo "<p >Die Nacht bricht herein ...</p>";
                         $eigeneAssoc = eigeneAssoc($mysqli);
                         if ($eigeneAssoc['countdownBis']>time())
                         {
@@ -402,7 +402,7 @@ p#liste {
                           $timerAb = 0;
                           $timerText = "";
                           $aktBeiTime = true;
-                          echo "<div align='center' id='timerdiv'></div>";
+                          echo "<div  id='timerdiv'></div>";
                         }
                         else
                         {
@@ -490,14 +490,14 @@ p#liste {
                             {
                               //Zeige an, mit wem ich verliebt bin
                               echo "<form action='Werwolf.php' method='post'>";
-                              echo "<p id='normal' align='center'>Der Pfeil des Amor, der nie sein Ziel verfehlt, trifft Sie und sie verlieben sich unsterblich ...</p>";
-                              echo "<p align='center'>Sie sind verliebt mit ".getName($mysqli,$eigeneAssoc['verliebtMit'])."</p>";
-                              echo "<p id='normal' align='center'>Sie spielen nun gemeinsam mit Ihrem Geliebten, gehören Sie unterschiedlichen Gruppierungen an,
+                              echo "<p class='normal' >Der Pfeil des Amor, der nie sein Ziel verfehlt, trifft Sie und sie verlieben sich unsterblich ...</p>";
+                              echo "<p >Sie sind verliebt mit ".getName($mysqli,$eigeneAssoc['verliebtMit'])."</p>";
+                              echo "<p class='normal' >Sie spielen nun gemeinsam mit Ihrem Geliebten, gehören Sie unterschiedlichen Gruppierungen an,
                               gewinnen Sie nur, wenn Sie alle anderen Spieler töten. Ansonsten gewinnen Sie wie gewohnt mit Ihrer Gruppierung (Dorfbewohner, Werwölfe)</p>";
                               //Auch den Charakter anzeigen
                               $verliebtRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = ".(int)$eigeneAssoc['verliebtMit']);
                               $verliebtAss = $verliebtRes->fetch_assoc();
-                              echo "<p align='center'>Identität: ".nachtidentitaetAlsString($verliebtAss['nachtIdentitaet'])."</p>";
+                              echo "<p >Identität: ".nachtidentitaetAlsString($verliebtAss['nachtIdentitaet'])."</p>";
                               toPlayerLog($mysqli,getName($mysqli,$eigeneAssoc['verliebtMit'])." ist ".nachtidentitaetAlsString($verliebtAss['nachtIdentitaet']),$eigeneID);
                               echo '<input type="hidden" name="verliebteWeiter" value=1 />';
                               echo '<p id = "normal" align = "center"><input type="submit" value = "Weiter"/></p></form>';
@@ -792,13 +792,13 @@ p#liste {
                                 }
                               }
                             }
-                            echo "<div id = 'timerdiv' align='center'></div><br>";
+                            echo "<div id = 'timerdiv' ></div><br>";
                             echo "<form name='list'><div id='listdiv'></div></form>"; //Die Liste, was die anderen gewählt haben
                             $listReload=true;
                             echo "<form action='Werwolf.php' method='post'>";
                             echo '<input type="hidden" name="werwolfAuswahl" value=1 />';
-                            echo "<p id='normal' align='center'>Für den Tod welches Spielers wollen Sie stimmen?</p>";
-                            echo "<p align='center'><select name = 'werwolfID' size = 1>";
+                            echo "<p class='normal' >Für den Tod welches Spielers wollen Sie stimmen?</p>";
+                            echo "<p ><select name = 'werwolfID' size = 1>";
                             $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                             while ($temp = $alleSpielerRes->fetch_assoc())
                             {
@@ -807,9 +807,9 @@ p#liste {
                             echo '</select></p><p id = "normal" align = "center"><input type="submit" value = "Für diesen Spieler stimmen"/></p></form>';
                             $gameAssoc = gameAssoc($mysqli);
                             if ($gameAssoc['werwolfeinstimmig']==1)
-                              echo "<p id='normal'>Zur Info: Die Wahl muss einstimmig sein, wählen Sie solange, bis die Wahl einstimmig ist</p>";
+                              echo "<p class='normal'>Zur Info: Die Wahl muss einstimmig sein, wählen Sie solange, bis die Wahl einstimmig ist</p>";
                             else
-                              echo "<p id='normal'>Zur Info: Die Mehrheit der Werwölfe bestimmt das Opfer (Einstimmigkeit bei mehr als 2 Spielern ist nicht erforderlich)</p>";
+                              echo "<p class='normal'>Zur Info: Die Mehrheit der Werwölfe bestimmt das Opfer (Einstimmigkeit bei mehr als 2 Spielern ist nicht erforderlich)</p>";
                             $pageReload = true; //Falls alle abgestimmt haben
                           }
                           else
@@ -974,7 +974,7 @@ p#liste {
                       }
                       elseif ($phase == PHASENACHTENDE)
                       {
-                        echo "<p align='center'>Es wird Morgen ...</p>";
+                        echo "<h3 >Es wird Morgen ...</h3>";
                         $eigeneAssoc = eigeneAssoc($mysqli);
                         if ($eigeneAssoc['countdownBis']>time())
                         {
@@ -983,7 +983,7 @@ p#liste {
                           $timerAb = 0;
                           $timerText = "";
                           $aktBeiTime = true;
-                          echo "<div align='center' id='timerdiv'></div>";
+                          echo "<div  id='timerdiv'></div>";
                         }
                         else
                         {
@@ -999,12 +999,12 @@ p#liste {
                         //Zeige den Tagestext an
                         $gameAssoc = gameAssoc($mysqli);
                         $tagestext = $gameAssoc['tagestext'];
-                        echo "<p align='center'>Der Tag beginnt</p>";
+                        echo "<h3 >Der Tag beginnt</h3>";
                         $eigeneAssoc = eigeneAssoc($mysqli);
-                        echo "<p align='center'>$tagestext</p>";
+                        echo "<p >$tagestext</p>";
                         if ($eigeneAssoc['popup_text'] != "")
                         {
-                            echo "<br><p align='center'>".$eigeneAssoc['popup_text']."</p>";
+                            echo "<br><p >".$eigeneAssoc['popup_text']."</p>";
                             $mysqli->Query("UPDATE $spielID"."_spieler SET popup_text = '' WHERE id = $eigeneID");
                         }
                         //Nachsehen, ob es einen Bürgermeister gibt
@@ -1082,9 +1082,9 @@ p#liste {
                       elseif ($phase == PHASEBUERGERMEISTERWAHL)
                       {
                         characterButton($mysqli);
-                        echo "<p align='center'>Wahl des Bürgermeisters</p>";
-                        echo "<p id='normal' align='center'>Da es momentan keinen Bürgermeister im Dorf gibt, beschließt das Dorf, einen zu wählen ...</p>";
-                        echo "<p id='normal' align='center'>Fragen Sie in die Runde, wer sich als Bürgermeister aufstellen lassen will und diskutieren Sie jede Bewerbung ...</p>";
+                        echo "<h3 >Wahl des Bürgermeisters</h3>";
+                        echo "<p class='normal' >Da es momentan keinen Bürgermeister im Dorf gibt, beschließt das Dorf, einen zu wählen ...</p>";
+                        echo "<p class='normal' >Fragen Sie in die Runde, wer sich als Bürgermeister aufstellen lassen will und diskutieren Sie jede Bewerbung ...</p>";
                         //Bürgermeisterwahl, ähnlich der Werwolfabstimmung
                         if (isset($_POST['buergermeisterWahlAuswahl']))
                         {
@@ -1127,15 +1127,15 @@ p#liste {
                         $listReload=true;
                         echo "<form action='Werwolf.php' method='post'>";
                         echo '<input type="hidden" name="buergermeisterWahlAuswahl" value=1 />';
-                        echo "<p id='normal' align='center'>Für welchen Spieler als Bürgermeister möchten Sie stimmen?</p>";
-                        echo "<p align='center'><select name = 'buergermeisterID' size = 1>";
+                        echo "<p class='normal' >Für welchen Spieler als Bürgermeister möchten Sie stimmen?</p>";
+                        echo "<p ><select name = 'buergermeisterID' size = 1>";
                         $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                         while ($temp = $alleSpielerRes->fetch_assoc())
                         {
                           echo "<option value = '".$temp['id']."'>".$temp['name']."</option>";
                         }
                         echo '</select></p><p id = "normal" align = "center"><input type="submit" value = "Für diesen Spieler stimmen"/></p></form>';
-                        echo "<p id='normal'>Der Bürgermeister beginnt Abstimmungen und erhält bei der Abstimmung des Dorfes jeden Tag eine zusätzliche halbe Stimme.
+                        echo "<p class='normal'>Der Bürgermeister beginnt Abstimmungen und erhält bei der Abstimmung des Dorfes jeden Tag eine zusätzliche halbe Stimme.
                         Über 50% der Spieler müssen für den Bürgermeister stimmen, damit er gewählt wird</p>";
                         echo "</form>";
                         $pageReload = true; //Falls alle abgestimmt haben
@@ -1168,8 +1168,8 @@ p#liste {
                           }
                         }
                         //Alle sehen diesen Text
-                        echo "<p align='center'>Diskussion</p>";
-                        echo "<p id='normal' align='center'>Diskutieren Sie mit, versuchen Sie die Werwölfe zu entlarven, die anderen aber von Ihrer Unschuld zu überzeugen</p>";
+                        echo "<h3 >Diskussion</h3>";
+                        echo "<p class='normal' >Diskutieren Sie mit, versuchen Sie die Werwölfe zu entlarven, die anderen aber von Ihrer Unschuld zu überzeugen</p>";
                         $pageReload = true;
                       }
                       elseif ($phase == PHASEANKLAGEN)
@@ -1197,8 +1197,8 @@ p#liste {
                           {
                             //Wen möchte ich anklagen?
                             echo "<form action='Werwolf.php' method='post'>";
-                            echo "<p id='normal' align='center'>Wollen Sie einen Spieler anklagen?</p>";
-                            echo "<p align='center'><select name = 'angeklagterID' size = 1>";
+                            echo "<p class='normal' >Wollen Sie einen Spieler anklagen?</p>";
+                            echo "<p ><select name = 'angeklagterID' size = 1>";
                             echo "<option value = '-1'>Niemand</option>";
                             $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                             while ($temp = $alleSpielerRes->fetch_assoc())
@@ -1237,7 +1237,7 @@ p#liste {
                         characterButton($mysqli);
                         //Abstimmung, bei Mehrheit wird Opfer getötet, sonst Stichwahl
                         //Wieder ähnlich wie Abstimmung für Bürgermeister
-                        echo "<div align='center' id='timerdiv'></div><br>";
+                        echo "<div  id='timerdiv'></div><br>";
                         echo "<form name='list'><div id='listdiv'></div></form>"; //Die Liste, was die anderen gewählt haben
                         $listReload=true;
                         $pageReload=true;
@@ -1346,8 +1346,8 @@ p#liste {
                             }
                           }
                           echo "<form action='Werwolf.php' method='post'>";
-                          echo "<p id='normal' align='center'>Für welchen der angeklagten Spieler möchten Sie stimmen?</p>";
-                          echo "<p align='center'><select name = 'dorfWahlID' size = 1>";
+                          echo "<p class='normal' >Für welchen der angeklagten Spieler möchten Sie stimmen?</p>";
+                          echo "<p ><select name = 'dorfWahlID' size = 1>";
                           $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND angeklagtVon > -1");
                           while ($temp = $alleSpielerRes->fetch_assoc())
                           {
@@ -1356,8 +1356,8 @@ p#liste {
                           echo '</select></p><p id = "normal" align = "center"><input type="submit" value = "Für diesen Spieler stimmen"/></p></form>';
                           echo "</form>";
                           echo "<form action='Werwolf.php' method='post'>";
-                          echo "<p id='normal' align='center'>Sie möchten für einen anderen Spieler stimmen?</p>";
-                          echo "<p align='center'><select name = 'dorfWahlID' size = 1>";
+                          echo "<p class='normal' >Sie möchten für einen anderen Spieler stimmen?</p>";
+                          echo "<p ><select name = 'dorfWahlID' size = 1>";
                           $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                           while ($temp = $alleSpielerRes->fetch_assoc())
                           {
@@ -1371,8 +1371,8 @@ p#liste {
                       {
                         characterButton($mysqli); 
                         //Es kommt zu einer Stichwahl
-                        echo "<p align='center'>Stichwahl</p>";
-                        echo "<div align='center' id='timerdiv'></div><br>";
+                        echo "<p >Stichwahl</p>";
+                        echo "<div  id='timerdiv'></div><br>";
                         echo "<form name='list'><div id='listdiv'></div></form>"; //Die Liste, was die anderen gewählt haben
                         $listReload=true;
                         $pageReload=true;
@@ -1430,8 +1430,8 @@ p#liste {
                             }
                           }
                           echo "<form action='Werwolf.php' method='post'>";
-                          echo "<p id='normal' align='center'>Für welchen der angeklagten Spieler möchten Sie bei der Stichwahl stimmen?</p>";
-                          echo "<p align='center'><select name = 'dorfWahlID' size = 1>";
+                          echo "<p class='normal' >Für welchen der angeklagten Spieler möchten Sie bei der Stichwahl stimmen?</p>";
+                          echo "<p ><select name = 'dorfWahlID' size = 1>";
                           $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND angeklagtVon > -1");
                           while ($temp = $alleSpielerRes->fetch_assoc())
                           {
@@ -1444,10 +1444,10 @@ p#liste {
                       elseif ($phase == PHASESIEGEREHRUNG)
                       {
                         $pageReload=true;
-                        echo "<p align='center'>Wir haben einen Sieger!<p>";
+                        echo "<h3 >Wir haben einen Sieger!</h3>";
                         $gameAssoc = gameAssoc($mysqli);
                         $tagestext = $gameAssoc['tagestext'];
-                        echo "<p align='center'>$tagestext</p>";
+                        echo "<p >$tagestext</p>";
                         //Der Spielleiter sollte ein neues Spiel starten können
                         $eigeneAssoc = eigeneAssoc($mysqli);
                         if ($eigeneAssoc['spielleiter']==1)
@@ -1460,7 +1460,7 @@ p#liste {
                           }
                           echo "<form action='Werwolf.php' method='post'>
                           <input type='hidden' name='neuesSpiel' value=1 />
-                          <p id='normal' align='center'><input type='submit' value='Neues Spiel'/></p>
+                          <p class='normal' ><input type='submit' value='Neues Spiel'/></p>
                           </form>";
                         }
                         echo "<form name='gameLogForm' id='gameLogForm' style='display:none'><div id='gamelogdiv'></div></form>";
@@ -1473,13 +1473,13 @@ p#liste {
               else
               {
                 //Das Spiel gibt es, aber nicht den Spieler
-                echo "<p id='error' align='center'>Sie sind momentan nicht mit diesem Spiel verknüpft </p>";
+                echo "<p class='error' >Sie sind momentan nicht mit diesem Spiel verknüpft </p>";
                 diesesSpielLoeschenButton();
               }
             }
             else
             {
-              echo "<p id='error' align='center'>Es sieht so aus, als gäbe es das Spiel nicht mehr ...</p>";
+              echo "<p class='error' >Es sieht so aus, als gäbe es das Spiel nicht mehr ...</p>";
               diesesSpielLoeschenButton();
               $logButtonAnzeigen = false;
             }
@@ -1619,7 +1619,7 @@ p#liste {
               else
               {
                 //kein Name eingegeben! erneut
-                echo "<p id='error' align='center'>Sie müssen einen gültigen Namen eingeben</p>";
+                echo "<p class='error' >Sie müssen einen gültigen Namen eingeben</p>";
                 start();
               }
             }
@@ -1665,7 +1665,7 @@ p#liste {
                           $stmt->bind_param('isi', $i, $_POST['ihrName'], $verifizierungsnr);
                           $stmt->execute();
                           $stmt->close();
-                          echo "<p align='center'>Sie sind dem Spiel erfolgreich beigetreten!</p>";
+                          echo "<p >Sie sind dem Spiel erfolgreich beigetreten!</p>";
                           setcookie ("SpielID", $spielID, time()+172800);
                           setcookie ("eigeneID",$i, time()+172800);
                           setcookie ("verifizierungsnr",$verifizierungsnr, time()+172800);
@@ -1689,21 +1689,21 @@ p#liste {
                   }
                   else
                   {
-                     echo "<p id='error' align='center'>Der angegebene Name ist bereits vorhanden oder ungültig</p>";
+                     echo "<p class='error' >Der angegebene Name ist bereits vorhanden oder ungültig</p>";
                   }
                   $stmt->close();
                 }
                 else
                 {
                   //Es existiert kein Spiel mit dieser Nummer --> Neustart
-                  echo "<p id='error' align='center'>Es existiert kein Spiel mit dieser Nummer ... </p>";
+                  echo "<p class='error' >Es existiert kein Spiel mit dieser Nummer ... </p>";
                 start();
                 }
               }
               else
               {
                 //kein Name eingegeben --> neustart
-                echo "<p id='error' align='center'>Sie müssen einen gültigen Namen eingeben</p>";
+                echo "<p class='error' >Sie müssen einen gültigen Namen eingeben</p>";
                 start();
               }
             } 
@@ -1724,7 +1724,7 @@ p#liste {
           $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID AND spielleiter = 1");
           if ($res->num_rows > 0)
           {
-              echo "<p align='center' ><input type='submit' value='Spieler entfernen' onClick='showRemovePlayerForm()'></p>";
+              echo "<p  ><input type='submit' value='Spieler entfernen' onClick='showRemovePlayerForm()'></p>";
               echo "<div id='sl_entfernen' style='display: none;'><hr>";
               $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
               while ($a = $res->fetch_assoc())
@@ -1732,7 +1732,7 @@ p#liste {
                   echo "<form action='Werwolf.php' method='post'>";
                   echo "<input type='hidden' name='entfernenID' value = ".$a['id'].">";
                   echo "<input type='hidden' name='spieler_entfernen' value = 1>";
-                  echo "<p id='normal' align='center'>".$a['name'];
+                  echo "<p class='normal' >".$a['name'];
                   echo"<input type='submit' value='entfernen' onClick='if (confirm(\"Wirklich diesen Spieler entfernen? Sie sollten das nur tun, wenn er inaktiv ist!\")==false){return false;}'></p>";
                   echo "</form>";
               }                                                                       
@@ -1742,24 +1742,24 @@ p#liste {
       }
       
 ?>
+</section>
+<section id="client-settings">
 <form action="Werwolf.php" method="post">
-  <p id = 'normal' align = "center">Löst oft viele Probleme: <input type="submit" value = "Reload" /></p>
+  <p>Löst oft viele Probleme: <input type="submit" value = "Reload" /></p>
 </form>
-<hr>
-<br>v1.1.0, Erstellt von Florian Lindenbauer
-<br>
-<br>
 <?php
 local_settings();
-echo "<hr>";
 if (isset($_COOKIE['SpielID']))
 {
   diesesSpielLoeschenButton();
 }
 ?>
-<br>
+</section>
+<footer id="info">
+v1.1.0, Erstellt von Florian Lindenbauer<br>
 <a href="http://www.werwolfonline.eu/info" target="_blank">Was ist Werwolf</a><br>
 <a href="http://www.werwolfonline.eu/info/index.php/anleitung" target="_blank">Anleitung</a><br>
+</footer>
 
 <script charset="ISO-8859-1" type="text/javascript">
 
@@ -2071,7 +2071,7 @@ var sekBisTimerBeginn;
         setTimeout(function(){ displayFade(tag,anzahl+1); }, 50);
       }
       var color = "#"+ RR + GG + BB;
-      document.body.style.backgroundColor = color;
+      document.getElementById("gameboard").style.backgroundColor = color;
     }
     else
     {
@@ -2103,7 +2103,7 @@ var sekBisTimerBeginn;
         setTimeout(function(){ displayFade(tag,anzahl+1); }, 50);
       }
       var color = "#"+ RR + GG + BB;
-      document.body.style.backgroundColor = color;
+      document.getElementById("gameboard").style.backgroundColor = color;
     }
   }
   function displayTag()
@@ -2124,7 +2124,7 @@ var sekBisTimerBeginn;
       if (BB.length < 2)
       { BB = "0"+BB;}
       var color = "#"+ RR + GG + BB;
-     document.body.style.backgroundColor = color; 
+     document.getElementById("gameboard").style.backgroundColor = color; 
   }
   
 </script>
@@ -2136,21 +2136,22 @@ function start()
 {
   //Diese Funktion zeigt das Startformular an, bei dem der Nutzer aufgefordert wird, ein Spiel zu erstellen, oder eine ID einzugeben
    ?>
-    <p align = "center" id='normal'>Sie befinden sich momentan in keinem Spiel: Sie können entweder einem bereits erstellten Spiel beitreten oder ein neues Spiel erstellen!</p>
-    <form action="Werwolf.php" method="post">
-      <p align='center'>Einem Spiel beitreten</p>
+   <div id="gameselect">
+    <h3>Willkommen</h3>
+    <p class='normal'>Sie befinden sich momentan in keinem Spiel: Sie können entweder einem bereits erstellten Spiel beitreten oder ein neues Spiel erstellen!</p>
+    <div><form action="Werwolf.php" method="post">
+      <h3 >Einem Spiel beitreten</h3>
       <input type="hidden" name="neuesSpiel" value=2 />
-      <p align = "center" id='normal'>Eine bestehende Spielnummer eingeben: <input type="text" name = "bestehendeSpielnummer"/></p>
-      <p align = "center" id='normal'>Ihr Name: <input type="text" name = "ihrName"/></p>
-      <p align = "center"><input type="submit" value = "Diesem Spiel beitreten" style="font-size:20px"/></p>
+      <span class='normal'><label for="bestehendeSpielnummerID">Eine bestehende Spielnummer eingeben: </label><input type="text" name = "bestehendeSpielnummer" id="bestehendeSpielnummerID"/></span>
+      <span class='normal'><label for="ihrName1ID">Ihr Name: </label><input type="text" name = "ihrName" id="ihrName1ID"/></span>
+      <span ><input type="submit" value = "Diesem Spiel beitreten"/></span>
     </form>
-    <hr>
     <form action="Werwolf.php" method="post">
-      <p align="center">Ein neues Spiel erstellen</p>
+      <h3>Ein neues Spiel erstellen</h3>
       <input type="hidden" name="neuesSpiel" value=1 />
-      <p align = "center" id='normal'>Ihr Name: <input type="text" name = "ihrName"/></p>
-      <p align="center"><input type="submit" value = "Ein neues Spiel erstellen" style="font-size:20px"/></p>
-    </form>
+      <span class='normal'><label for="ihrName2ID">Ihr Name: </label><input type="text" name = "ihrName" id="ihrName2ID"/></span>
+      <span ><input type="submit" value = "Ein neues Spiel erstellen"/></span>
+    </form></div></div>
           <?php
 }
 
@@ -2180,29 +2181,29 @@ function local_settings()
 {
   //Lässt lokale Einstellungen (in Cookies gespeichert) wie Farbe zu.
   ?>
-  <p align='center'><button onClick='show_settings()'>Einstellungen</button></p>
-  <div id = 'player_settings' style='display: none;'>
+  <div>
+  <p ><button onClick='show_settings()'>Einstellungen</button></p>
+  <div id ='player_settings' style='display: none;'>
   <form action="Werwolf.php" method="post">
-      <p align="center">Farbeinstellungen</p>
+      <h3>Farbeinstellungen</h3>
       <input type="hidden" name="settings_color" value=1 />
 <?php
       global $c_p_r, $c_p_g, $c_p_b, $c_back_n_r, $c_back_n_g, $c_back_n_b, $c_back_d_r, $c_back_d_g, $c_back_d_b, $c_n_r, $c_n_g, $c_n_b;
       $color = sprintf("#%02x%02x%02x", $c_p_r, $c_p_g, $c_p_b);
-      echo "<p align = 'center' id='normal'>Überschriften: <input type='color' name='color_slider_p' value='$color'></p>";
+      echo "<span ><label for='color_slider_pID'>Überschriften: </label><input type='color' name='color_slider_p' id='color_slider_pID' value='$color'></span>";
       $color = sprintf("#%02x%02x%02x", $c_back_n_r, $c_back_n_g, $c_back_n_b);
-      echo "<p align = 'center' id='normal'>Hintergrund Nacht: <input type='color' name='color_slider_n' value='$color'></p>";
+      echo "<span ><label for='color_slider_nID'>Hintergrund Nacht: </label><input type='color' name='color_slider_n' id='color_slider_nID' value='$color'></span>";
       $color = sprintf("#%02x%02x%02x", $c_back_d_r, $c_back_d_g, $c_back_d_b);
-      echo "<p align = 'center' id='normal'>Hintergrund Tag: <input type='color' name='color_slider_d' value='$color'></p>";
+      echo "<span ><label for='color_slider_dID'>Hintergrund Tag: </label><input type='color' name='color_slider_d' id='color_slider_dID' value='$color'></span>";
       $color = sprintf("#%02x%02x%02x", $c_n_r, $c_n_g, $c_n_b);
-      echo "<p align = 'center' id='normal'>Normaler Text: <input type='color' name='color_slider_norm' value='$color'></p>";
+      echo "<span ><label for='color_slider_normID'>Normaler Text: </label><input type='color' name='color_slider_norm' id='color_slider_normID' value='$color'></span>";
       ?>
-      <p align="center"><input type="submit" value = "Speichern und reload" /></p>
+      <span><input type="submit" value = "Speichern und reload" /></span>
     </form>
     <form action="Werwolf.php" method="post">
     <input type="hidden" name="settings_color" value=2 />
-    <p align="center"><input type="submit" value = "Standardwerte wiederherstellen" /></p>
-    </form>
-  <hr></div> <?php
+    <span ><input type="submit" value = "Standardwerte wiederherstellen" /></span>
+    </form></div></div> <?php
 
 }
 function save_local_settings()
@@ -2301,100 +2302,101 @@ function spielRegeln($mysqli)
   $zufaelligauswaehlen = $gameResAssoc['zufaelligeAuswahl'];
   $zufaelligeAuswahlBonus = $gameResAssoc['zufaelligeAuswahlBonus'];
   echo "
-  <form action='Werwolf.php' method='post' name='auswahl'>
+  <form action='Werwolf.php' method='post' id='gamesettings' name='auswahl'>
     <input type='hidden' name='editierenAuswahl' value=1 />
-    <p align='center'>Allgemein</p>
-    <p id='normal' align='center'>Bürgermeister</p>";
+    <div><h3 >Allgemein</h3>
+    <span><label for='buergermeisterID' >Bürgermeister </label>";
   if ($buergermeisterWeitergeben == 0)
-    echo "<p align='center'><select name = 'buergermeister' size = 1><option value = '0' selected=true>Beim Tod des Bürgermeisters wird ein neuer gewählt</option><option value = '1'>Der Bürgermeister gibt das Amt bei seinem Tod weiter</option></select></p>";
+    echo "<select name = 'buergermeister' id='buergermeisterID' size = 1><option value = '0' selected=true>Beim Tod des Bürgermeisters wird ein neuer gewählt</option><option value = '1'>Der Bürgermeister gibt das Amt bei seinem Tod weiter</option></select></span>";
   else
-    echo "<p align='center'><select name = 'buergermeister' size = 1><option value = '0'>Beim Tod des Bürgermeisters wird ein neuer gewählt</option><option value = '1' selected=true>Der Bürgermeister gibt das Amt bei seinem Tod weiter</option></select></p>";
-  echo "<p id='normal' align='center'>Tote Charaktere</p>";
+    echo "<select name = 'buergermeister' id='buergermeisterID' size = 1><option value = '0'>Beim Tod des Bürgermeisters wird ein neuer gewählt</option><option value = '1' selected=true>Der Bürgermeister gibt das Amt bei seinem Tod weiter</option></select></span>";
+  echo "<span><label for='charaufdeckenID' >Tote Charaktere </label>";
   if ($charaktereAufdecken == 0)
-    echo "<p align='center'><select name = 'aufdecken' size = 1><option value = '0' selected=true>nicht aufdecken</option><option value = '1'>aufdecken</option></select></p>";
+    echo "<select name = 'aufdecken' id='charaufdeckenID' size = 1><option value = '0' selected=true>nicht aufdecken</option><option value = '1'>aufdecken</option></select></span>";
   else
-    echo "<p align='center'><select name = 'aufdecken' size = 1><option value = '0'>nicht aufdecken</option><option value = '1' selected=true>aufdecken</option></select></p>";
-  echo "<p id='normal' align='center'>Seher</p>";
+    echo "<select name = 'aufdecken' id='charaufdeckenID' size = 1><option value = '0'>nicht aufdecken</option><option value = '1' selected=true>aufdecken</option></select></span>";
+  echo "<span><label for='sehersiehtID' >Seher </label>";
   if ($seherSiehtIdentitaet == 0)
-    echo "<p align='center'><select name = 'seherSieht' size = 1><option value = '0' selected=true>Seher sieht die Gesinnung</option><option value = '1'>Seher sieht die Identität</option></select></p>";
+    echo "<select name = 'seherSieht' id='sehersiehtID' size = 1><option value = '0' selected=true>Seher sieht die Gesinnung</option><option value = '1'>Seher sieht die Identität</option></select></span>";
   else
-    echo "<p align='center'><select name = 'seherSieht' size = 1><option value = '0' >Seher sieht die Gesinnung</option><option value = '1' selected=true>Seher sieht die Identität</option></select></p>";
-  echo "<p align='center'>Charaktere</p>";
+    echo "<select name = 'seherSieht' id='sehersiehtID' size = 1><option value = '0' >Seher sieht die Gesinnung</option><option value = '1' selected=true>Seher sieht die Identität</option></select></span>";
+  echo "</div><div><h3 >Charaktere</h3>";
   if ($zufaelligauswaehlen == 0)
   {
-    echo "<p id='normal' align='center'>Werwölfe: <INPUT TYPE='number'   NAME='werwoelfe' value=$werwolfzahl MIN=0>
+    echo "<span class='normal' ><label for='werwolfanzahl'>Werwölfe: </label><INPUT TYPE='number'  id='werwolfanzahl' NAME='werwoelfe' value=$werwolfzahl MIN=0>
       <INPUT TYPE='button' VALUE='+' NAME ='werwolfbutton1' OnClick='auswahl.werwoelfe.value=parseInt(auswahl.werwoelfe.value) + 1; '>
-      <INPUT TYPE='button' VALUE='-' NAME ='werwolfbutton2' OnClick='auswahl.werwoelfe.value -=1 '></p>";
+      <INPUT TYPE='button' VALUE='-' NAME ='werwolfbutton2' OnClick='auswahl.werwoelfe.value -=1 '></span>";
   }
   else
   {
-    echo "<p id='normal' align='center'>Werwölfe: <INPUT TYPE='number'   NAME='werwoelfe' value=$werwolfzahl MIN=0 DISABLED = true>
+    echo "<span class='normal' ><label for='werwolfanzahl'>Werwölfe: </label><INPUT TYPE='number'  id='werwolfanzahl' NAME='werwoelfe' value=$werwolfzahl MIN=0 DISABLED = true>
       <INPUT TYPE='button' VALUE='+' NAME ='werwolfbutton1' DISABLED = true OnClick='auswahl.werwoelfe.value=parseInt(auswahl.werwoelfe.value) + 1; '>
-      <INPUT TYPE='button' VALUE='-' NAME ='werwolfbutton2' DISABLED = true OnClick='auswahl.werwoelfe.value -=1 '></p>";
+      <INPUT TYPE='button' VALUE='-' NAME ='werwolfbutton2' DISABLED = true OnClick='auswahl.werwoelfe.value -=1 '></span>";
   }
-  echo "<p id='normal' align='center'>Seher: <INPUT TYPE='number'   NAME='seher' Size='2' value=$seherzahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.seher.value=parseInt(auswahl.seher.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.seher.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Hexe: <INPUT TYPE='number'   NAME='hexe' Size='2' value=$hexenzahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.hexe.value=parseInt(auswahl.hexe.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.hexe.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Jäger: <INPUT TYPE='number'   NAME='jaeger' Size='2' value=$jaegerzahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.jaeger.value=parseInt(auswahl.jaeger.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.jaeger.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Beschützer: <INPUT TYPE='number'   NAME='beschuetzer' Size='2' value=$beschuetzerzahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.beschuetzer.value=parseInt(auswahl.beschuetzer.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.beschuetzer.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Paranormaler Ermittler: <INPUT TYPE='number'   NAME='parErm' Size='2' value=$parErmZahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.parErm.value=parseInt(auswahl.parErm.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.parErm.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Lykantroph: <INPUT TYPE='number'   NAME='lykantrophen' Size='2' value=$lykantrophenzahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.lykantrophen.value=parseInt(auswahl.lykantrophen.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.lykantrophen.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Spion: <INPUT TYPE='number'   NAME='spione' Size='2' value=$spionezahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.spione.value=parseInt(auswahl.spione.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.spione.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Mordlustige: <INPUT TYPE='number'   NAME='idioten' Size='2' value=$idiotenzahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.idioten.value=parseInt(auswahl.idioten.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.idioten.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Pazifist: <INPUT TYPE='number'   NAME='pazifisten' Size='2' value=$pazifistenzahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.pazifisten.value=parseInt(auswahl.pazifisten.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.pazifisten.value -=1 '></p>";
-   echo "<p id='normal' align='center'>Die Alten: <INPUT TYPE='number'   NAME='alten' Size='2' value=$altenzahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.alten.value=parseInt(auswahl.alten.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.alten.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Urwolf / Urwölfin: <INPUT TYPE='number'   NAME='urwolf' Size='2' value=$urwolfzahl MIN=0>
-    <INPUT TYPE='button' VALUE='+' OnClick='auswahl.urwolf.value=parseInt(auswahl.urwolf.value) + 1; '>
-    <INPUT TYPE='button' VALUE='-' OnClick='auswahl.urwolf.value -=1 '></p>";
-  echo "<p id='normal' align='center'>Amor: <INPUT TYPE='number'   NAME='amor' Size='2' value=$amorzahl MIN=0 MAX=1>
-    <INPUT TYPE='button' VALUE='1' OnClick='auswahl.amor.value=1; '>
-    <INPUT TYPE='button' VALUE='0' OnClick='auswahl.amor.value=0; '></p>";
-  echo "<p id='normal' align='center'><INPUT TYPE='checkbox' ";
+  echo "<span class='normal' ><label for='seheranzahl'> Seher: </label><INPUT TYPE='number'   NAME='seher' id='seheranzahl' Size='2' value=$seherzahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.seher.value=parseInt(auswahl.seher.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.seher.value -=1 '></span>";
+  echo "<span class='normal' ><label for='hexenanzahl'>Hexe: </label><INPUT TYPE='number'   NAME='hexe' id='hexenanzahl' Size='2' value=$hexenzahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.hexe.value=parseInt(auswahl.hexe.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.hexe.value -=1 '></span>";
+  echo "<span class='normal' ><label for='jaegeranzahl'>Jäger: </label><INPUT TYPE='number'   NAME='jaeger' id='jaegeranzahl' Size='2' value=$jaegerzahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.jaeger.value=parseInt(auswahl.jaeger.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.jaeger.value -=1 '></span>";
+  echo "<span class='normal' ><label for='beschuetzeranzahl'>Beschützer: </label><INPUT TYPE='number'   NAME='beschuetzer' id='beschuetzeranzahl' Size='2' value=$beschuetzerzahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.beschuetzer.value=parseInt(auswahl.beschuetzer.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.beschuetzer.value -=1 '></span>";
+  echo "<span class='normal' ><label for='parermanzahl'>Paranormaler Ermittler: </label><INPUT TYPE='number'   NAME='parErm' id='parermanzahl' Size='2' value=$parErmZahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.parErm.value=parseInt(auswahl.parErm.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.parErm.value -=1 '></span>";
+  echo "<span class='normal' ><label for='lynkantrophenanzahl'>Lykantroph: </label><INPUT TYPE='number'   NAME='lykantrophen' id='lynkantrophenanzahl' Size='2' value=$lykantrophenzahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.lykantrophen.value=parseInt(auswahl.lykantrophen.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.lykantrophen.value -=1 '></span>";
+  echo "<span class='normal' ><label for='spionanzahl'>Spion: </label><INPUT TYPE='number'   NAME='spione' id='spionanzahl' Size='2' value=$spionezahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.spione.value=parseInt(auswahl.spione.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.spione.value -=1 '></span>";
+  echo "<span class='normal' ><label for='idiotenanzahl'>Mordlustige: </label><INPUT TYPE='number'   NAME='idioten' id='idiotenanzahl' Size='2' value=$idiotenzahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.idioten.value=parseInt(auswahl.idioten.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.idioten.value -=1 '></span>";
+  echo "<span class='normal' ><label for='pazifistenanzahl'>Pazifist: </label><INPUT TYPE='number'   NAME='pazifisten' id='pazifistenanzahl' Size='2' value=$pazifistenzahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.pazifisten.value=parseInt(auswahl.pazifisten.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.pazifisten.value -=1 '></span>";
+   echo "<span class='normal' ><label for='altenanzahl'>Die Alten: </label><INPUT TYPE='number'   NAME='alten' id='altenanzahl' Size='2' value=$altenzahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.alten.value=parseInt(auswahl.alten.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.alten.value -=1 '></span>";
+  echo "<span class='normal' ><label for='urwolfanzahl'>Urwolf / Urwölfin: </label><INPUT TYPE='number'   NAME='urwolf' id='urwolfanzahl' Size='2' value=$urwolfzahl MIN=0>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.urwolf.value=parseInt(auswahl.urwolf.value) + 1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='-' OnClick='auswahl.urwolf.value -=1 '></span>";
+  echo "<span class='normal' ><label for='amoranzahl'>Amor: </label><INPUT TYPE='number'   NAME='amor' id='armoranzahl' Size='2' value=$amorzahl MIN=0 MAX=1>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='1' OnClick='auswahl.amor.value=1; '>
+    <INPUT TYPE='button' class='inc-dec-button' VALUE='0' OnClick='auswahl.amor.value=0; '></span>";
+  echo "<span class='normal' ><INPUT TYPE='checkbox' ";
   if ($zufaelligauswaehlen == 1)
     echo "CHECKED = true";
-  echo " NAME='zufaelligauswaehlen' VALUE='zufall' 
+  echo " NAME='zufaelligauswaehlen' id='zufaelligauswaehlenID' VALUE='zufall' 
   onClick='if (auswahl.zufaelligauswaehlen.checked) {
     auswahl.werwoelfe.value=0;
     auswahl.werwoelfe.disabled = true; auswahl.werwolfbutton1.disabled=true; auswahl.werwolfbutton2.disabled=true;}
     else {
-    auswahl.werwoelfe.disabled = false;auswahl.werwolfbutton1.disabled=false; auswahl.werwolfbutton2.disabled=false;}'> Die Charaktere verdeckt und zufällig auswählen</p>
-    <p id='normal' align='center'>Geben Sie dazu eine maximale Anzahl von Charakteren ein, die vorkommen sollen, bei Werwölfen müssen sie nichts eingeben<br>
+    auswahl.werwoelfe.disabled = false;auswahl.werwolfbutton1.disabled=false; auswahl.werwolfbutton2.disabled=false;}'><label for='zufaelligauswaehlenID'> Die Charaktere verdeckt und zufällig auswählen </label></span>
+    <p class='normal' >Geben Sie dazu eine maximale Anzahl von Charakteren ein, die vorkommen sollen, bei Werwölfen müssen sie nichts eingeben<br>
     Zusätzlich können Sie noch einen Wert eingeben, der die Verteilung bestimmt. Ein positiver Wert erleichtert das Spiel für die Dorfbewohner, ein negativer für die Werwölfe (nur bei der zufälligen Charakterverteilung)</p>";
-  echo "<p id='normal' align='center'>Verteilung der zufälligen Charaktere <INPUT TYPE='number'   NAME='zufaelligeAuswahlBonus' Size='2' value=$zufaelligeAuswahlBonus MIN=-15 MAX=15></p>";
-  echo "<br><p align='center'>Countdown-Einstellungen</p>";
-  echo "<p id='normal' align='center'><INPUT TYPE='button' VALUE='Countdowns zurücksetzen' OnClick='auswahl.werwolftimer1.value=60; auswahl.werwolfzusatz1.value=4; auswahl.werwolftimer2.value=50; auswahl.werwolfzusatz2.value=3; auswahl.dorftimer.value=550; auswahl.dorfzusatz.value=10; auswahl.dorfstichwahltimer.value=200; auswahl.dorfstichwahlzusatz.value=5'></p>";
-  echo "<p id='normal' align='center'>Sekunden, bis die Werwölfe nicht mehr einstimmig wählen müssen:
-    <INPUT TYPE='number' NAME='werwolftimer1' SIZE='2' VALUE=$werwolftimer1 MIN='20' MAX='500'><br>
-    Zusätzliche Zeit pro Werwolf: <INPUT TYPE='number' NAME='werwolfzusatz1' SIZE='2' VALUE=$werwolfzusatz1 MIN='0' MAX='60'></p>";
-  echo "<p id='normal' align='center'>Sekunden, bis nach Ablaufen der Einstimmigkeit die Wahl der Werwölfe erfolglos ist:
-    <INPUT TYPE='number' NAME='werwolftimer2' SIZE='2' VALUE=$werwolftimer2 MIN='10' MAX='500'><br>
-    Zusätzliche Zeit pro Werwolf: <INPUT TYPE='number' NAME='werwolfzusatz2' SIZE='2' VALUE=$werwolfzusatz2 MIN='0' MAX='60'></p>";
-  echo "<p id='normal' align='center'>Sekunden, bis die normale Abstimmung des Dorfes am Tag erfolglos ist:
-    <INPUT TYPE='number' NAME='dorftimer' SIZE='2' VALUE=$dorftimer MIN='60' MAX='7200'><br>
-    Zusätzliche Zeit pro Dorfbewohner: <INPUT TYPE='number' NAME='dorfzusatz' SIZE='2' VALUE=$dorfzusatz MIN='0' MAX='300'></p>";
-  echo "<p id='normal' align='center'>Sekunden, bis die Stichwahl am Tag erfolglos ist:
-    <INPUT TYPE='number' NAME='dorfstichwahltimer' SIZE='2' VALUE=$dorfstichwahltimer MIN='30' MAX='3600'><br>
-    Zusätzliche Zeit pro Dorfbewohner: <INPUT TYPE='number' NAME='dorfstichwahlzusatz' SIZE='2' VALUE=$dorfstichwahlzusatz MIN='0' MAX='300'></p>"; 
-  echo "<p align = 'center'><input type='submit' value = 'Speichern'/></p>";
+  echo "<span class='normal' ><label for='zufaelligeAuswahlBonusID'> Verteilung der zufälligen Charaktere </label><INPUT TYPE='number'   NAME='zufaelligeAuswahlBonus' id='zufaelligeAuswahlBonusID' Size='2' value=$zufaelligeAuswahlBonus MIN=-15 MAX=15></span>";
+  echo "</div>";
+  echo "<div><h3 >Countdown-Einstellungen</h3>";
+  echo "<span class='normal' ><INPUT TYPE='button' VALUE='Countdowns zurücksetzen' OnClick='auswahl.werwolftimer1.value=60; auswahl.werwolfzusatz1.value=4; auswahl.werwolftimer2.value=50; auswahl.werwolfzusatz2.value=3; auswahl.dorftimer.value=550; auswahl.dorfzusatz.value=10; auswahl.dorfstichwahltimer.value=200; auswahl.dorfstichwahlzusatz.value=5'></span>";
+  echo "<span class='normal' ><label for='werwolftimer1ID'>Sekunden, bis die Werwölfe nicht mehr einstimmig wählen müssen: </label>
+    <INPUT TYPE='number' NAME='werwolftimer1' id='werwolftimer1ID' SIZE='2' VALUE=$werwolftimer1 MIN='20' MAX='500'><br>
+    <label for='werwolfzusatz1ID'>Zusätzliche Zeit pro Werwolf: </label><INPUT TYPE='number' NAME='werwolfzusatz1' id='werwolfzusatz1ID' SIZE='2' VALUE=$werwolfzusatz1 MIN='0' MAX='60'></span>";
+  echo "<span class='normal' ><label for='werwolftimer2ID'>Sekunden, bis nach Ablaufen der Einstimmigkeit die Wahl der Werwölfe erfolglos ist: </label>
+    <INPUT TYPE='number' NAME='werwolftimer2' id='werwolftimer2ID' SIZE='2' VALUE=$werwolftimer2 MIN='10' MAX='500'><br>
+    <label for='werwolfzusatz2ID'>Zusätzliche Zeit pro Werwolf: </label><INPUT TYPE='number' NAME='werwolfzusatz2' id='werwolfzusatz2ID' SIZE='2' VALUE=$werwolfzusatz2 MIN='0' MAX='60'></span>";
+  echo "<span class='normal' ><label for='dorftimerID'>Sekunden, bis die normale Abstimmung des Dorfes am Tag erfolglos ist: </label>
+    <INPUT TYPE='number' NAME='dorftimer' id='dorftimerID' SIZE='2' VALUE=$dorftimer MIN='60' MAX='7200'><br>
+    <label for='dorfzusatzID'>Zusätzliche Zeit pro Dorfbewohner: </label><INPUT TYPE='number' NAME='dorfzusatz' id='dorfzusatzID' SIZE='2' VALUE=$dorfzusatz MIN='0' MAX='300'></span>";
+  echo "<span class='normal' ><label for='dorfstichwahltimerID'>Sekunden, bis die Stichwahl am Tag erfolglos ist: </label>
+    <INPUT TYPE='number' NAME='dorfstichwahltimer' id='dorfstichwahltimerID' SIZE='2' VALUE=$dorfstichwahltimer MIN='30' MAX='3600'><br>
+    <label for='dorfstichwahlzusatzID'>Zusätzliche Zeit pro Dorfbewohner: </label><INPUT TYPE='number' NAME='dorfstichwahlzusatz' id='dorfstichwahlzusatzID' SIZE='2' VALUE=$dorfstichwahlzusatz MIN='0' MAX='300'></span>"; 
+  echo "</div><span align = 'center'><input type='submit' value = 'Speichern'/></span>";
   echo "</form>";
 }
 
@@ -2448,7 +2450,7 @@ function spielRegelnAnwenden($mysqli)
     }
     catch (Exception $e)
     {
-      echo "<p id='error' align='center'>Eine oder mehrere Countdown-Einstellungen sind ungültig</p>";
+      echo "<p class='error' >Eine oder mehrere Countdown-Einstellungen sind ungültig</p>";
       $werwolftimer1 = 60;
       $werwolfzusatz1 = 4;
       $werwolftimer2 = 50;
@@ -2494,7 +2496,7 @@ function spielInitialisieren($mysqli,$spielerzahl)
   //Zuerst überprüfen, ob mindestens 2 Spieler mitspielen
   if ($spielerzahl < 2)
   {
-    echo "<p id='error' align='center'>Zu wenig Spieler, um ein Spiel zu starten!</p>";
+    echo "<p class='error' >Zu wenig Spieler, um ein Spiel zu starten!</p>";
     return false;
   }
   $gameResult = $mysqli->Query("SELECT * FROM $spielID"."_game");
@@ -2520,7 +2522,7 @@ function spielInitialisieren($mysqli,$spielerzahl)
     + $lykantrophenzahl + $spionezahl + $idiotenzahl + $pazifistenzahl + $altenzahl + $urwolfzahl;
   if ($besondereCharaktere > $spielerzahl && $zufaelligeAuswahl == 0)
   {
-    echo "<p id='error' align='center'>Nicht genug Spieler für Ihre Spielkonfiguration</p>";
+    echo "<p class='error' >Nicht genug Spieler für Ihre Spielkonfiguration</p>";
     return false;
   }
   
@@ -2528,14 +2530,14 @@ function spielInitialisieren($mysqli,$spielerzahl)
   $boeseCharaktere = $werwolfzahl + $urwolfzahl;
   if ($boeseCharaktere < 1 && $zufaelligeAuswahl == 0)
   {
-    echo "<p id='error' align='center'>Ein Spiel mit dieser Konfiguration ist nicht möglich. Haben Sie mindestens einen Werwolf ausgewählt?</p>";
+    echo "<p class='error' >Ein Spiel mit dieser Konfiguration ist nicht möglich. Haben Sie mindestens einen Werwolf ausgewählt?</p>";
     return false;
   }
   
   //Schau, dass es max einen Amor gibt
   if ($amorzahl < 0 || $amorzahl > 1)
   {
-    echo "<p id='error' align='center'>Ein Spiel mit dieser Anzahl an Amor(s) ist nicht möglich ... Nur 1 oder 0 auswählen</p>";
+    echo "<p class='error' >Ein Spiel mit dieser Anzahl an Amor(s) ist nicht möglich ... Nur 1 oder 0 auswählen</p>";
     return false;
   }
   
@@ -2608,7 +2610,7 @@ function spielStarten($mysqli)
     + $lykantrophenzahl + $spionezahl + $idiotenzahl + $pazifistenzahl + $altenzahl + $urwolfzahl;
   if (($besondereCharaktere > $spielerzahl && $zufaelligeAuswahl == 0)|| $spielerzahl < 2)
   {
-    echo "<p id='error' align='center'>Nicht genug Spieler für Ihre Spielkonfiguration</p>";
+    echo "<p class='error' >Nicht genug Spieler für Ihre Spielkonfiguration</p>";
     //Setze die Spielphase wieder auf 0
     $mysqli->Query("UPDATE $spielID"."_game SET spielphase = 0");
     $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1");
@@ -2619,7 +2621,7 @@ function spielStarten($mysqli)
   $boeseCharaktere = $werwolfzahl + $urwolfzahl;
   if ($boeseCharaktere < 1 && $zufaelligeAuswahl == 0)
   {
-    echo "<p id='error' align='center'>Ein Spiel mit dieser Konfiguration ist nicht möglich. Haben Sie mindestens einen Werwolf ausgewählt?</p>";
+    echo "<p class='error' >Ein Spiel mit dieser Konfiguration ist nicht möglich. Haben Sie mindestens einen Werwolf ausgewählt?</p>";
     //Setze die Spielphase wieder auf 0
     $mysqli->Query("UPDATE $spielID"."_game SET spielphase = 0");
     $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1");
@@ -2639,7 +2641,7 @@ function spielStarten($mysqli)
     $werwolfzahl = 0;
     if ($zufaelligeAuswahlBonus < -15 || $zufaelligeAuswahlBonus > 15)
     {
-      echo "<p id='error' align='center'>Der Spielbonus ist zu hoch oder zu niedrig</p>";
+      echo "<p class='error' >Der Spielbonus ist zu hoch oder zu niedrig</p>";
       //Setze die Spielphase wieder auf 0
       $mysqli->Query("UPDATE $spielID"."_game SET spielphase = 0");
       $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1");
@@ -3117,7 +3119,7 @@ function toeteSpieler($mysqli, $spielerID)
 function warteAufAndere()
 {
   //Zeigt das warteAufAnder an, damit es bei jedem gleich aussieht
-  echo "<p align='center'>Warte auf andere Spieler</p>";
+  echo "<h3 >Warte auf andere Spieler</h3>";
 }
 
 function dorfbewohnerWeiterschlafen()
@@ -3139,15 +3141,15 @@ function amorInitialisiere($mysqli)
   //Im Prinzip besteht das Formular aus zwei Listen aller Lebenden Spieler
   echo "<form action='Werwolf.php' method='post'>";
   echo '<input type="hidden" name="amorHatAusgewaehlt" value=1 />';
-  echo "<p id='normal' align='center'>Welche beiden Spieler möchten Sie verlieben?</p>";
-  echo "<p align='center'><select name = 'amorID1' size = 1>";
+  echo "<p class='normal' >Welche beiden Spieler möchten Sie verlieben?</p>";
+  echo "<p ><select name = 'amorID1' size = 1>";
   $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $alleSpielerRes->fetch_assoc())
   {
     echo "<option value = '".$temp['id']."'>".$temp['name']."</option>";
   }
   echo '</select></p>';
-  echo "<p align='center'><select name = 'amorID2' size = 1>";
+  echo "<p ><select name = 'amorID2' size = 1>";
   $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $alleSpielerRes->fetch_assoc())
   {
@@ -3164,7 +3166,7 @@ function amorGueltig($mysqli,$wahl1,$wahl2)
   //Überprüfe, ob die Wahl gültig ist ...
   if ($wahl1 == $wahl2)
   {
-    echo "<p id='error' align='center'>Zwei verschiedene Spieler auswählen ...</p>";
+    echo "<p class='error' >Zwei verschiedene Spieler auswählen ...</p>";
     return false;
   }
   if ($wahl1 < 0 || $wahl2 < 0)
@@ -3187,15 +3189,15 @@ function spionInitialisiere($mysqli)
   //Zeige eine Liste aller lebenden Spieler an
   echo "<form action='Werwolf.php' method='post'>";
   echo '<input type="hidden" name="spionHatAusgewaehlt" value=1 />';
-  echo "<p id='normal' align='center'>Sie als Spion(in) dürfen die Identität eines Spielers überprüfen. Welchen Spieler möchten Sie näher betrachten?</p>";
-  echo "<p align='center'><select name = 'spionID' size = 1>";
+  echo "<p class='normal' >Sie als Spion(in) dürfen die Identität eines Spielers überprüfen. Welchen Spieler möchten Sie näher betrachten?</p>";
+  echo "<p ><select name = 'spionID' size = 1>";
   $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $alleSpielerRes->fetch_assoc())
   {
     echo "<option value = '".$temp['id']."'>".$temp['name']."</option>";
   }
-  echo '</select></p><p align="center" id="normal">Welche Identität glauben Sie, besitzt dieser Spieler?</p>';
-  echo "<p align='center'><select name = 'spionIdentitaet' size = 1>";
+  echo '</select></p><p align="center" class="normal">Welche Identität glauben Sie, besitzt dieser Spieler?</p>';
+  echo "<p ><select name = 'spionIdentitaet' size = 1>";
   //Alle Identitäten auflisten
   for ($i = 1; $i< 100; $i++)
   {
@@ -3227,7 +3229,7 @@ function spionSehe($mysqli, $id, $identitaet)
   {
     $text = $spielerAssoc['name']." ist nicht ". $strIdentitaet;
   }
-  echo "<h1 align='center'>$text</h1>";
+  echo "<h1 >$text</h1>";
   
   //Schreibe es auch ins playerlog, damit es der Spieler nachlesen kann
   toPlayerLog($mysqli, $text,$eigeneID);
@@ -3245,9 +3247,9 @@ function urwolfInitialisiere($mysqli)
   //Zeige eine Liste aller lebenden Spieler an
   echo "<form action='Werwolf.php' method='post'>";
   echo '<input type="hidden" name="urwolfHatAusgewaehlt" value=1 />';
-  echo "<p id='normal' align='center'>Sie als Urwolf/Urwölfin können einmal im Spiel einen anderen Spieler zum Werwolf machen. Wen wollen Sie wählen?<br>
+  echo "<p class='normal' >Sie als Urwolf/Urwölfin können einmal im Spiel einen anderen Spieler zum Werwolf machen. Wen wollen Sie wählen?<br>
   Wenn Sie niemanden zum Werwolf machen wollen, wählen sie 'Niemand' aus</p>";
-  echo "<p align='center'><select name = 'urwolfID' size = 1>";
+  echo "<p ><select name = 'urwolfID' size = 1>";
   echo "<option value = '-1'>Niemand</option>";
   $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $alleSpielerRes->fetch_assoc())
@@ -3282,7 +3284,7 @@ function urwolfHandle($mysqli, $id)
     
     $text = $spielerAssoc['name']." ist jetzt ein Werwolf!";
     $stmt->close();
-    echo "<h1 align='center'>$text</h1>";
+    echo "<h1 >$text</h1>";
     
     //Schreibe es auch ins playerlog, damit es der Spieler nachlesen kann
     toPlayerLog($mysqli, $text, $eigeneID);
@@ -3311,8 +3313,8 @@ function seherInitialisiere($mysqli)
   //Zeige eine Liste aller lebenden Spieler an
   echo "<form action='Werwolf.php' method='post'>";
   echo '<input type="hidden" name="seherHatAusgewaehlt" value=1 />';
-  echo "<p id='normal' align='center'>Sie als Seher(in) dürfen die Identität eines Spielers erfahren. Welchen Spieler möchten Sie näher betrachten?</p>";
-  echo "<p align='center'><select name = 'seherID' size = 1>";
+  echo "<p class='normal' >Sie als Seher(in) dürfen die Identität eines Spielers erfahren. Welchen Spieler möchten Sie näher betrachten?</p>";
+  echo "<p ><select name = 'seherID' size = 1>";
   $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $alleSpielerRes->fetch_assoc())
   {
@@ -3348,7 +3350,7 @@ function seherSehe($mysqli, $id)
     else
       $identitaet = getGesinnung($spielerAssoc['nachtIdentitaet'])." (Gesinnung)";
   }
-  echo "<h1 align='center'>".$spielerAssoc['name']." = $identitaet</h1>";
+  echo "<h1 >".$spielerAssoc['name']." = $identitaet</h1>";
   
   //Schreibe es auch ins playerlog, damit es der Spieler nachlesen kann
   toPlayerLog($mysqli, $spielerAssoc['name']." = $identitaet",$eigeneID);
@@ -3366,13 +3368,13 @@ function beschuetzerInitialisiere($mysqli)
   //Zeige an, wer letzte Nacht beschützt wurde...
   $eigeneAssoc = eigeneAssoc($mysqli);
   if ($eigeneAssoc['beschuetzerLetzteRundeBeschuetzt'] >= 0)
-    echo "<p id='normal' align='center'>Letzte Nacht beschützten Sie ".getName($mysqli,$eigeneAssoc['beschuetzerLetzteRundeBeschuetzt'])."</p>";
+    echo "<p class='normal' >Letzte Nacht beschützten Sie ".getName($mysqli,$eigeneAssoc['beschuetzerLetzteRundeBeschuetzt'])."</p>";
   
   //Zeige eine Liste aller lebenden Spieler an
   echo "<form action='Werwolf.php' method='post'>";
   echo '<input type="hidden" name="beschuetzerHatAusgewaehlt" value=1 />';
-  echo "<p id='normal' align='center'>Sie als Beschützer(in) dürfen einen Spieler diese Nacht beschützen (Auch Sie selbst)</p>";
-  echo "<p align='center'><select name = 'beschuetzerID' size = 1>";
+  echo "<p class='normal' >Sie als Beschützer(in) dürfen einen Spieler diese Nacht beschützen (Auch Sie selbst)</p>";
+  echo "<p ><select name = 'beschuetzerID' size = 1>";
   $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $alleSpielerRes->fetch_assoc())
   {
@@ -3415,8 +3417,8 @@ function parErmInitialisiere($mysqli)
   //Zeige eine Liste aller lebenden Spieler an
   echo "<form action='Werwolf.php' method='post'>";
   echo '<input type="hidden" name="parErmHatAusgewaehlt" value=1 />';
-  echo "<p id='normal' align='center'>Welchen Spieler + (lebende) Nachbarn wollen Sie näher beobachten?</p>";
-  echo "<p align='center'><select name = 'parErmID' size = 1>";
+  echo "<p class='normal' >Welchen Spieler + (lebende) Nachbarn wollen Sie näher beobachten?</p>";
+  echo "<p ><select name = 'parErmID' size = 1>";
   $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $alleSpielerRes->fetch_assoc())
   {
@@ -3502,7 +3504,7 @@ function hexeInitialisieren($mysqli)
   $gameAss = gameAssoc($mysqli);
   if ($gameAss['werwolfopfer']!=-1)
   {
-    echo "<p align='center' id='normal'>Opfer der Werwölfe: ";
+    echo "<p  class='normal'>Opfer der Werwölfe: ";
     echo getName($mysqli,$gameAss['werwolfopfer']);
     echo "</p>";
     
@@ -3514,14 +3516,14 @@ function hexeInitialisieren($mysqli)
     if ($heiltraenke > 0)
     {
       //Die Hexe fragen, ob sie das Opfer heilen will
-      echo "<p align='center'><select name = 'hexeHeilen' size = 1><option value = '0' selected=true>Das Opfer nicht heilen</option><option value = '1'>Das Opfer heilen</option></select></p>";
+      echo "<p ><select name = 'hexeHeilen' size = 1><option value = '0' selected=true>Das Opfer nicht heilen</option><option value = '1'>Das Opfer heilen</option></select></p>";
     }
   }
   //Die Hexe fragen, ob sie jemanden töten will, wenn sie denn noch einen Trank hat ...
   if ($todestraenke > 0)
   {
-    echo "<p id='normal' align='center'>Sie dürfen Ihren Todestrank verwenden und jemanden töten. Wen wollen Sie töten?</p>";
-    echo "<p align='center'><select name = 'toeten' size = 1>";
+    echo "<p class='normal' >Sie dürfen Ihren Todestrank verwenden und jemanden töten. Wen wollen Sie töten?</p>";
+    echo "<p ><select name = 'toeten' size = 1>";
     echo "<option value = '-1'>Niemanden</option>";
     $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
     while ($temp = $alleSpielerRes->fetch_assoc())
@@ -3542,8 +3544,8 @@ function jaegerInitialisiere($mysqli)
   //Zeige eine Liste aller noch lebenden an, die der Jäger töten kann
   echo "<form action='Werwolf.php' method='post'>";
   echo '<input type="hidden" name="jaegerHatAusgewaehlt" value=1 />';
-  echo "<p id='normal' align='center'>Sie als Jäger(in) dürfen einen Spieler mit in den Tod reißen: </p>";
-  echo "<p align='center'><select name = 'jaegerID' size = 1>";
+  echo "<p class='normal' >Sie als Jäger(in) dürfen einen Spieler mit in den Tod reißen: </p>";
+  echo "<p ><select name = 'jaegerID' size = 1>";
   $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $alleSpielerRes->fetch_assoc())
   {
@@ -3561,8 +3563,8 @@ function buergermeisterInitialisiere($mysqli)
   //Zeige eine Liste aller noch Lebenden an, an die der Bürgermeister das Amt weitergeben kann
   echo "<form action='Werwolf.php' method='post'>";
   echo '<input type="hidden" name="buergermeisterNachfolger" value=1 />';
-  echo "<p id='normal' align='center'>Sie als Bürgermeister(in) dürfen einen Spieler als Ihren Nachfolger bestimmen: </p>";
-  echo "<p align='center'><select name = 'buergermeisterID' size = 1>";
+  echo "<p class='normal' >Sie als Bürgermeister(in) dürfen einen Spieler als Ihren Nachfolger bestimmen: </p>";
+  echo "<p ><select name = 'buergermeisterID' size = 1>";
   $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
   while ($temp = $alleSpielerRes->fetch_assoc())
   {
@@ -3835,8 +3837,8 @@ function binTot()
 {
   //Zeige einen Button an, mit dem die Spiellog datei angezeigt werden kann.
   $spielID = $_COOKIE['SpielID'];
-  echo "<p align='center'>Sie sind leider bereits gestorben ...</p>";
-  echo "<p id='normal' align='center'>Verhalten Sie sich ruhig und stören Sie nicht das Spiel der anderen. Verraten Sie keine Informationen, damit die anderen Spieler ihr Spielerlebnis genießen können.</p>";
+  echo "<h3 >Sie sind leider bereits gestorben ...</h3>";
+  echo "<p class='normal' >Verhalten Sie sich ruhig und stören Sie nicht das Spiel der anderen. Verraten Sie keine Informationen, damit die anderen Spieler ihr Spielerlebnis genießen können.</p>";
   echo "<form name='list'><div id='listdiv'></div></form>"; //Auch als Toter will ich eine Liste haben :)
   echo "<form name='gameLogForm' id='gameLogForm' style='display:none'><div id='gamelogdiv'></div></form>";
   echo "<input type='submit' value='spiellog anzeigen' onClick='showGameLog($spielID);'";
@@ -4077,10 +4079,10 @@ function playerLogButton($mysqli)
   //Zeigt einen Button an, auf den der Spieler klicken kann, um sein Playerlog zu sehen
   $eigeneAss = eigeneAssoc($mysqli);
   $myLog = $eigeneAss['playerlog'];
-  echo "<p id='normal' align='center'><input type='submit' value = 'Log anzeigen/verbergen' onClick='showHidePlayerLog();'/></p>";
+  echo "<p class='normal' ><input type='submit' value = 'Log anzeigen/verbergen' onClick='showHidePlayerLog();'/></p>";
   echo "<form id = 'PlayerLog' style='display: none;'>";
-  echo "<hr><p id = 'normal' align='center'>$myLog</p>";
-  echo "<hr></form>";
+  echo "<p id = 'normal' >$myLog</p>";
+  echo "</form>";
 }
 
 function characterButton($mysqli)
@@ -4089,9 +4091,9 @@ function characterButton($mysqli)
   $eigeneAss = eigeneAssoc($mysqli);
   $charString = nachtidentitaetAlsString($eigeneAss['nachtIdentitaet']);
   $charErklaerung = nachtidentitaetKurzerklaerung($eigeneAss['nachtIdentitaet']);
-  echo "<hr><p id='normal' align='center'><input type='submit' value = 'Charakter anzeigen/verbergen' onClick='showHideCharacter();'/></p>";
+  echo "<hr><p class='normal' ><input type='submit' value = 'Charakter anzeigen/verbergen' onClick='showHideCharacter();'/></p>";
   echo "<form id='CharacterInfo' style='display: none;'>";
-  echo "<p align='center'>$charString</p><p id= 'normal' align = 'center' >$charErklaerung</p>";
+  echo "<h3 >$charString</h3><p class='normal'>$charErklaerung</p>";
   echo "</form><hr><br>";
 }
 

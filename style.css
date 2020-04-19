@@ -1,0 +1,208 @@
+body { 
+	margin:auto;
+	background-color: white;
+	font-family: sans-serif;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	min-height: 100vh;
+}
+
+h1 {
+    color: #fff;
+	font-size:2em;
+	margin: 0;
+	padding: 0.5em 0;
+}
+
+h2 {
+	color: blue;
+	font-size: 3em;
+}
+
+
+section {
+	margin: 5px 0;
+	padding: 5px;
+	font-family: sans-serif;
+	}
+
+#header {
+	text-align: left;
+	height: 4em;
+	background-color: #333;
+	margin: 0 0 5px;
+	padding: 0 2vw;
+}	
+
+#gameboard {
+	max-width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	border-radius: 5px;
+}
+
+#playername {
+	background-color: #fff;
+	padding: 4px 4px;
+	border-radius: 4px;
+}
+
+#playername p {
+	margin: 0;
+	color: #000;
+}
+
+#gameselect div{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	margin: 10px;
+}
+
+#gameselect div form{
+	display: flex;
+	flex-direction: column;
+	min-width: 45%;
+	justify-content: space-between;
+	padding: 5px;
+}
+
+#gameselect div form span{
+	display: flex;
+	flex-direction: column;
+	margin: 8px 0 0 0;
+}
+
+#gameselect div form label{
+	color: #fff;
+}
+
+#gameselect input {
+	font-size: larger;
+}
+
+#client-settings {
+	color: #000;
+	text-align: center;
+}
+
+#client-settings p{
+	color: #000;
+}
+
+#player_settings {
+	background-color: #eee;
+	max-width: 500px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 5px;
+	border: 0.5px solid #333;
+	border-radius: 2px;
+}
+
+#player_settings form {
+	display: flex;
+	flex-direction: column;
+}
+
+#player_settings form span {
+	margin: 0.2em 0;
+}
+
+#player_settings h3 {
+	margin-top: 10px;
+}
+
+#gamesettings {
+	display: flex;
+	flex-direction: column;
+	background-color: #eee;
+	border-radius: 2px;
+	padding: 5px;
+}
+
+#gamesettings div{
+	display: flex;
+	flex-direction: column;
+}
+
+#gamesettings > span {
+	margin: 15px 5px 10px;
+}
+
+#gamesettings div span {
+	margin-top: 8px;
+}
+
+#gamesettings > div > p {
+	text-align: left;
+	color: #000;
+	background-color: darkorange;
+	border: 2px solid red;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+#gamesettings input[type=submit] {
+	font-size: larger;
+}
+
+.inc-dec-button {
+	width: 2em;
+}
+
+#info {
+	text-align: left;
+	background-color: #eee;
+	margin: 5px 0 0 0;
+	padding: 10px 2vw;
+}
+#info a{
+	text-decoration: none;
+}
+
+button, input {
+	border: 1.5px solid #444;
+	border-radius: 4px;
+	padding: 4px 6px;
+	margin: 1px;
+}
+
+button:hover, input:hover {
+	color: #eee;
+	border: 2px solid #ccc;
+	padding: 3px 5px;
+	background-color: #555;
+}
+
+input[type=text], input[type=number] {
+	color: #000;
+	background-color: #fff;
+}
+
+select {
+	height: 40px;
+	outline: none;
+	cursor: pointer;
+}
+
+
+#PlayerLog p, #gamelogdiv p {
+	font-family: monospace;
+	padding: 8px;
+	color: #fff;
+	background-color: #444;
+	line-height: 2em;
+	text-align: left;
+}
+
+#listdiv {
+	background-color: #eee;
+	margin: 10px auto;
+	max-width: 500px;
+	padding: 10px 0;
+	border-radius: 2px;
+}
