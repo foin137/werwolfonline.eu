@@ -1696,7 +1696,7 @@ p#liste {
                 else
                 {
                   //Es existiert kein Spiel mit dieser Nummer --> Neustart
-                  echo "<p class='error' >Es existiert kein Spiel mit dieser Nummer ... </p>";
+                  echo "<p class='error' >Es existiert kein Spiel mit dieser Nummer! </p>";
                 start();
                 }
               }
@@ -2324,14 +2324,14 @@ function spielRegeln($mysqli)
   if ($zufaelligauswaehlen == 0)
   {
     echo "<span class='normal' ><label for='werwolfanzahl'>Werwölfe: </label><INPUT TYPE='number'  id='werwolfanzahl' NAME='werwoelfe' value=$werwolfzahl MIN=0>
-      <INPUT TYPE='button' VALUE='+' NAME ='werwolfbutton1' OnClick='auswahl.werwoelfe.value=parseInt(auswahl.werwoelfe.value) + 1; '>
-      <INPUT TYPE='button' VALUE='-' NAME ='werwolfbutton2' OnClick='auswahl.werwoelfe.value -=1 '></span>";
+      <INPUT TYPE='button' class='inc-dec-button' VALUE='+' NAME ='werwolfbutton1' OnClick='auswahl.werwoelfe.value=parseInt(auswahl.werwoelfe.value) + 1; '>
+      <INPUT TYPE='button' class='inc-dec-button' VALUE='-' NAME ='werwolfbutton2' OnClick='auswahl.werwoelfe.value -=1 '></span>";
   }
   else
   {
     echo "<span class='normal' ><label for='werwolfanzahl'>Werwölfe: </label><INPUT TYPE='number'  id='werwolfanzahl' NAME='werwoelfe' value=$werwolfzahl MIN=0 DISABLED = true>
-      <INPUT TYPE='button' VALUE='+' NAME ='werwolfbutton1' DISABLED = true OnClick='auswahl.werwoelfe.value=parseInt(auswahl.werwoelfe.value) + 1; '>
-      <INPUT TYPE='button' VALUE='-' NAME ='werwolfbutton2' DISABLED = true OnClick='auswahl.werwoelfe.value -=1 '></span>";
+      <INPUT TYPE='button' class='inc-dec-button' VALUE='+' NAME ='werwolfbutton1' DISABLED = true OnClick='auswahl.werwoelfe.value=parseInt(auswahl.werwoelfe.value) + 1; '>
+      <INPUT TYPE='button' class='inc-dec-button' VALUE='-' NAME ='werwolfbutton2' DISABLED = true OnClick='auswahl.werwoelfe.value -=1 '></span>";
   }
   echo "<span class='normal' ><label for='seheranzahl'> Seher: </label><INPUT TYPE='number'   NAME='seher' id='seheranzahl' Size='2' value=$seherzahl MIN=0>
     <INPUT TYPE='button' class='inc-dec-button' VALUE='+' OnClick='auswahl.seher.value=parseInt(auswahl.seher.value) + 1; '>
@@ -3129,7 +3129,7 @@ function dorfbewohnerWeiterschlafen()
   echo '<form action="Werwolf.php" method="post">
       <input type="hidden" name="weiterschlafen" value=1 />
       <p id = "normal" align = "center">'.$text.'</p>
-      <p id = "normal" align = "center"><input type="submit" value = "Weiterschlafen"/></p>
+      <p id = "normal" align = "center"><input class="weiterschlafen-btn" type="submit" value = "Weiterschlafen"/></p>
     </form>';
 }
 

@@ -37,10 +37,29 @@ section {
 
 #gameboard {
 	max-width: 1000px;
+	width: 1000px;
+	min-height: min(55vh, 800px);
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
 	border-radius: 5px;
+}
+
+@media only screen and (max-width: 1000px) {
+	h1 {
+		font-size: 1.5em;
+		text-align: center;
+	}
+
+
+    #gameboard {
+		max-width: 99vw;
+		width: calc(100vw - 10px);
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
+		border-radius: 0;
+	}
 }
 
 #playername {
@@ -205,4 +224,8 @@ select {
 	max-width: 500px;
 	padding: 10px 0;
 	border-radius: 2px;
+}
+
+.weiterschlafen-btn {
+	font-size: larger;
 }
