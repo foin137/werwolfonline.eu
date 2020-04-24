@@ -1787,8 +1787,10 @@ var sekBisTimerBeginn;
    
    function reloadmaintain(game, id){				
     xmlhttp.onreadystatechange=function()
+    {
+      if (xmlhttp.readyState==4)
       {
-      if (xmlhttp.readyState==4 && xmlhttp.status==200)
+        if (xmlhttp.status == 200)
         {
          if (xmlhttp.responseText == "1")
          {
@@ -1799,7 +1801,13 @@ var sekBisTimerBeginn;
             setTimeout(reloadmaintain,3500,game,id);
          }
         }
+        else
+        {
+          //Error
+          setTimeout(reloadmaintain,2*3500,game,id);
+        }
       }
+    }
     xmlhttp.open("GET","reload.php?game="+ game +"&id="+ id,true);
     xmlhttp.send();
 	}
@@ -1812,47 +1820,55 @@ var sekBisTimerBeginn;
     xmlhttp2.mscaching = "disabled";
     xmlhttp2.onreadystatechange=function()
       {
-      if (xmlhttp2.readyState==4 && xmlhttp2.status==200)
+        if (xmlhttp2.readyState==4)
         {
-          var arr = xmlhttp2.responseText.split("$");
-          if (arr.length > 0)
+          if (xmlhttp2.status==200)
           {
-            if (reload == 1 && arr[0] == 1)
+            var arr = xmlhttp2.responseText.split("$");
+            if (arr.length > 0)
             {
-                setTimeout(self.location.href="Werwolf.php",1);
-                return;    
-            }
-            var count = (arr.length-1)/2;
-            var para = document.getElementById("listdiv");
-            while (para.firstChild) {
-                para.removeChild(para.firstChild);
-            }
-            
-            
-            for (var i = 0; i < count; i++)
-            {
-              var temp = document.createElement("p");
-              temp.id = "liste";
-              temp.appendChild(document.createTextNode(arr[2*i+1]));
-              if (arr[2*i+2]==0)
-                temp.style.color = "black";
-              else if (arr[2*i+2]==1)
-                temp.style.color = "green";
-              else if (arr[2*i+2]==2)
-                temp.style.color = "red";
-              else if (arr[2*i+2]==3)
+              if (reload == 1 && arr[0] == 1)
               {
-                temp.style.fontSize="200%";
-                temp.style.lineHeight="3";
-                temp.style.color = "black";
+                  setTimeout(self.location.href="Werwolf.php",1);
+                  return;    
               }
-              else if (arr[2*i+2]==4)
-                temp.style.color = "grey";
-              temp.align="center";
-              para.appendChild(temp);
+              var count = (arr.length-1)/2;
+              var para = document.getElementById("listdiv");
+              while (para.firstChild) {
+                  para.removeChild(para.firstChild);
+              }
+              
+              
+              for (var i = 0; i < count; i++)
+              {
+                var temp = document.createElement("p");
+                temp.id = "liste";
+                temp.appendChild(document.createTextNode(arr[2*i+1]));
+                if (arr[2*i+2]==0)
+                  temp.style.color = "black";
+                else if (arr[2*i+2]==1)
+                  temp.style.color = "green";
+                else if (arr[2*i+2]==2)
+                  temp.style.color = "red";
+                else if (arr[2*i+2]==3)
+                {
+                  temp.style.fontSize="200%";
+                  temp.style.lineHeight="3";
+                  temp.style.color = "black";
+                }
+                else if (arr[2*i+2]==4)
+                  temp.style.color = "grey";
+                temp.align="center";
+                para.appendChild(temp);
+              }
             }
+            setTimeout(listRefresh,3000,game,id, reload);
           }
-          setTimeout(listRefresh,3000,game,id, reload); 
+          else
+          {
+            //Error
+            setTimeout(listRefresh,2*3000,game,id, reload);
+          } 
         }
       }
     xmlhttp2.send(null);
@@ -1862,25 +1878,33 @@ var sekBisTimerBeginn;
   {
     xmlhttp3.onreadystatechange=function()
       {
-      if (xmlhttp3.readyState==4 && xmlhttp3.status==200)
+        if (xmlhttp3.readyState==4)
         {
-          var text = xmlhttp3.responseText;
-          var para = document.getElementById("gamelogdiv");
-          while (para.firstChild) {
-              para.removeChild(para.firstChild);
-          }
-          var temp = document.createElement("p");
-          temp.id = "normal";
-          var withBreaks = text.split("<br>");
-          for(var i = 0; i < withBreaks.length; i++) {
-          	temp.appendChild(document.createTextNode(withBreaks[i]));
-          	temp.appendChild(document.createElement("br"));
-          }
-          temp.align="center";
-          para.appendChild(temp);
-          if (refreshGameLog == 1)
+          if (xmlhttp3.status==200)
           {
-            setTimeout(gameLogRefresh,8000,game);
+            var text = xmlhttp3.responseText;
+            var para = document.getElementById("gamelogdiv");
+            while (para.firstChild) {
+                para.removeChild(para.firstChild);
+            }
+            var temp = document.createElement("p");
+            temp.id = "normal";
+            var withBreaks = text.split("<br>");
+            for(var i = 0; i < withBreaks.length; i++) {
+              temp.appendChild(document.createTextNode(withBreaks[i]));
+              temp.appendChild(document.createElement("br"));
+            }
+            temp.align="center";
+            para.appendChild(temp);
+            if (refreshGameLog == 1)
+            {
+              setTimeout(gameLogRefresh,8000,game);
+            }
+          }
+          else
+          {
+            //Error
+            setTimeout(gameLogRefresh,2*8000,game);
           }
         }
       }
