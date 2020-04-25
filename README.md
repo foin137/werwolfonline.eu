@@ -9,7 +9,7 @@ However, I would not consider myself a professional programmer, even less at the
 If you have any comments or tips, please let me know! If you like, you may also contribute, but I am new to Git(Hub), so please be patient with me ;)
 
 # What is required?
-The game is written in php, so will need a php parser on your webserver.
+The game is written in php, so you will need a php parser on your webserver.
 
 Output buffering needs to be enabled due to some maybe not quite ideal programming. Otherwise, cookies cannot be set.
 You can find the corresponding setting "output_buffering" in the php.ini file. Setting it to 4096 should work.
