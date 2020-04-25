@@ -18,7 +18,7 @@ You also need a database called "werwolf", you do not need to insert any tables,
 
 Rename 'includes.example.php' to 'includes.php' and insert your id, passwort and host.
 
-If you want to use a different database name, you can change it in 'includes.php'
+If you want to use a different database name, you can change it in 'includes.php'.
 
 # Deutsche Anleitung
 Das ist Quellcode einer php Internetanwendung "werwolfonline", die ich vor ein paar Jahren geschrieben habe. Man findet eine spielbare Version auf www.werwolfonline.eu
@@ -32,10 +32,10 @@ Ich würde mich freuen, wenn jemand Tipps oder weitere Vorschläge hat! Wer will
 Einen Webserver mit php interpreter und einer Datenbank namens "werwolf".
 
 Auf dem Webserver muss output buffering aktiviert sein, ansonsten können keine Cookies gespeichert werden.
-Die Einstellung findet man in der php.ini Datei unter "output_buffering". Ein Wert von 4096 sollte funktioniern.
+Die Einstellung findet man in der php.ini Datei unter "output_buffering". Ein Wert von 4096 sollte funktionieren.
 
 Die Datenbank muss keine Tabellen enthalten, die werden vom php Skript selbst erstellt.
 
 Benenne 'includes.example.php' in 'includes.php' um und füge id, passwort und host für die Anmeldung in der Datenbank hinzu!
 
-Es kann natürlich auch ein anderer Name für die Datenbank verwendet werden. Die zugehörige Einstellung kann in 'includes.php' vorgenommen werden
+Es kann natürlich auch ein anderer Name für die Datenbank verwendet werden. Die zugehörige Einstellung kann in 'includes.php' vorgenommen werden.
