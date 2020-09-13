@@ -3495,7 +3495,7 @@ function parErmAusgewaehlt($mysqli, $id)
     //Wir waren der letzte
     $nachbar2 = $erster;
   }
-  $werwoelfe = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ". CHARLYKANTROPH .") AND (ID = $nachbar1 OR ID = $nachbar2 OR ID = $id)");
+  $werwoelfe = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ". CHARLYKANTROPH ." OR nachtIdentitaet = ". CHARURWOLF .") AND (ID = $nachbar1 OR ID = $nachbar2 OR ID = $id)");
   if ($werwoelfe->num_rows > 0)
   {
     //Es ist zumindest ein Werwolf darunter
@@ -4032,7 +4032,7 @@ function nachtidentitaetKurzerklaerung($identitaet)
       return "Sie können jede Nacht einen Spieler beschützen, der in dieser Nacht nicht sterben kann (Sie können sich auch selbst wählen). Sie dürfen nicht zwei Nächte hintereinander dieselbe Person schützen.";
       break;
     case CHARPARERM:
-      return "Sie können einmal im Spiel einen Spieler bestimmen und erfahren, ob sich unter diesem und den beiden Nachbarn zumindest ein Werwolf befindet.";
+      return "Sie können einmal im Spiel einen Spieler bestimmen und erfahren, ob sich unter diesem und den beiden Nachbarn zumindest ein Werwolf (oder Urwolf) befindet.";
       break;
     case CHARLYKANTROPH:
       return "Sie sehen aus wie ein Werwolf, sind aber keiner. Sie spielen also für die Dorfbewohner";
