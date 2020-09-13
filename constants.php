@@ -1,6 +1,6 @@
 <?php
 //Constants
-define("_VERSION","v1.2.2");
+define("_VERSION","v1.2.3");
 define("_LISTMAXRELOADTIME",3000);
 
 //Phasen 

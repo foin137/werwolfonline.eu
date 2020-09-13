@@ -215,7 +215,7 @@ p#liste {
                   //Weiters schauen wir noch, ob der Bürgermeister sein Amt weitergeben muss...
                   $buergermeisterRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE buergermeisterDarfWeitergeben = 1");
                   $gameAssoc = gameAssoc($mysqli); //Nur Bürgermeister weitergeben, wenn das Spiel noch nicht aus ist
-                  if ($buergermeisterRes->num_rows > 0 && $gameAssoc['spielphase'] != PHASESIEGEREHRUNG)
+                  if ($buergermeisterRes->num_rows > 0 && $gameAssoc['spielphase'] != PHASESIEGEREHRUNG && $gameAssoc['spielphase'] != PHASESPIELSETUP && $gameAssoc['spielphase'] != PHASESETUP)
                   {
                     //Der Bürgermeister wurde getötet und darf sein Amt weitergeben ...
                     $buergermA = $buergermeisterRes->fetch_assoc();
