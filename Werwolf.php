@@ -1756,7 +1756,7 @@ if (isset($_COOKIE['SpielID']))
 ?>
 </section>
 <footer id="info">
-v1.2.1, Erstellt von Florian Lindenbauer<br>
+<?php echo "". _VERSION ?>, Erstellt von Florian Lindenbauer<br>
 <a href="http://www.werwolfonline.eu/info" target="_blank">Was ist Werwolf</a><br>
 <a href="http://www.werwolfonline.eu/info/index.php/anleitung" target="_blank">Anleitung</a><br>
 </footer>
