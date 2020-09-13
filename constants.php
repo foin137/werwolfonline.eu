@@ -1,8 +1,9 @@
 <?php
-//Phasen
-
+//Constants
+define("_VERSION","v1.2.2");
 define("_LISTMAXRELOADTIME",3000);
- 
+
+//Phasen 
 define ("PHASESETUP",0);
 define ("PHASESPIELSETUP",1);
 define ("PHASENACHTBEGINN",2);
