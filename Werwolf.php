@@ -3505,9 +3505,9 @@ function parErmAusgewaehlt($mysqli, $id)
   }
   else
   {
-    toPlayerLog ($mysqli,"Sie beobachteten die Spieler ". getName($mysqli,$nachbar1) .", ". getName($mysqli,$id) ." und ".getName($mysqli,$nachbar2)." Es fällt Ihnen nichts Besonderes auf, unter den dreien befindet sich kein Werwolf",$eigeneID);
+    toPlayerLog ($mysqli,"Sie beobachteten die Spieler ". getName($mysqli,$nachbar1) .", ". getName($mysqli,$id) ." und ".getName($mysqli,$nachbar2).". Es fällt Ihnen nichts Besonderes auf, unter den dreien befindet sich kein Werwolf.",$eigeneID);
     toGameLog($mysqli,"Der Paranormale Ermittler beobachtete die Spieler ". getName($mysqli,$nachbar1) .", ". getName($mysqli,$id) ." und ".getName($mysqli,$nachbar2).". Er sieht, dass sich unter ihnen kein Werwolf befindet.");
-    echo ("<p align = 'center'>Sie beobachteten die Spieler ". getName($mysqli,$nachbar1) .", ". getName($mysqli,$id) ." und ".getName($mysqli,$nachbar2)." Es fällt Ihnen nichts Besonderes auf, unter den dreien befindet sich kein Werwolf</p>");
+    echo ("<p align = 'center'>Sie beobachteten die Spieler ". getName($mysqli,$nachbar1) .", ". getName($mysqli,$id) ." und ".getName($mysqli,$nachbar2).". Es fällt Ihnen nichts Besonderes auf, unter den dreien befindet sich kein Werwolf.</p>");
   }
   
   $mysqli->Query("UPDATE $spielID"."_spieler SET parErmEingesetzt = 1 WHERE id = $eigeneID");
