@@ -2994,6 +2994,9 @@ function phaseInitialisieren($phase,$mysqli)
       }
     }
     
+    //entferne doppelte Einträge:
+    $tote = array_unique($tote, SORT_NUMERIC);
+
     //Nun töte alle Toten und schreib die Namen in einen String zwecks Anzeige
     $mysqli->query("UPDATE $spielID"."_spieler SET dieseNachtGestorben = 0");
     $anzeigeString = "Am Morgen findet das Dorf folgende Tote: ";
