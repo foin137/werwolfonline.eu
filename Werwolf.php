@@ -186,8 +186,9 @@ p#liste {
                 
                 //Bevor wir noch auf die Phase schauen, schauen wir, ob irgendetwas unabhängig von der Phase ist
                 //wie zum Beispiel der Tod des Jägers
+                $gameAssoc = gameAssoc($mysqli);
                 $jaegerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE jaegerDarfSchiessen = 1");
-                if ($jaegerRes->num_rows > 0)
+                if ($jaegerRes->num_rows > 0 && $gameAssoc['spielphase'] != PHASESIEGEREHRUNG && $gameAssoc['spielphase'] != PHASESPIELSETUP && $gameAssoc['spielphase'] != PHASESETUP)
                 {
                   $jaegerA = $jaegerRes->fetch_assoc();
                   if ($jaegerA['id']==$eigeneID)
