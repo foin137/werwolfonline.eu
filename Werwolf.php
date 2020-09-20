@@ -229,8 +229,8 @@ p#liste {
                         $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1");
                         $neuerBuergermeister = (int)$_POST['buergermeisterID'];
                         $mysqli->Query("UPDATE $spielID"."_spieler SET buergermeister = 1 WHERE id = $neuerBuergermeister");
-                        toGameLog($mysqli,getName($mysqli,$neuerBuergermeister)." wurde als Nachfolger des Bürgermeisters eingesetzt");
-                        toAllPlayerLog($mysqli,getName($mysqli,$neuerBuergermeister)." wurde als Nachfolger des Bürgermeisters eingesetzt");
+                        toGameLog($mysqli,getName($mysqli,$neuerBuergermeister)." wurde als Nachfolger des Bürgermeisters eingesetzt.");
+                        toAllPlayerLog($mysqli,getName($mysqli,$neuerBuergermeister)." wurde als Nachfolger des Bürgermeisters eingesetzt.");
                         $pageReload = true;
                       }
                       buergermeisterInitialisiere($mysqli);
@@ -498,7 +498,7 @@ p#liste {
                               $verliebtRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = ".(int)$eigeneAssoc['verliebtMit']);
                               $verliebtAss = $verliebtRes->fetch_assoc();
                               echo "<p >Identität: ".nachtidentitaetAlsString($verliebtAss['nachtIdentitaet'])."</p>";
-                              toPlayerLog($mysqli,getName($mysqli,$eigeneAssoc['verliebtMit'])." ist ".nachtidentitaetAlsString($verliebtAss['nachtIdentitaet']),$eigeneID);
+                              toPlayerLog($mysqli,getName($mysqli,$eigeneAssoc['verliebtMit'])." ist ".nachtidentitaetAlsString($verliebtAss['nachtIdentitaet']) .".",$eigeneID);
                               echo '<input type="hidden" name="verliebteWeiter" value=1 />';
                               echo '<p id = "normal" align = "center"><input type="submit" value = "Weiter"/></p></form>';
                             }
@@ -862,8 +862,8 @@ p#liste {
                                   {
                                     $heilTraenkeNeu = (int)$eigeneAssoc['hexeHeiltraenke']-1;
                                     $mysqli->Query("UPDATE $spielID"."_spieler SET hexeHeiltraenke = $heilTraenkeNeu, hexeHeilt = 1 WHERE id = $eigeneID");
-                                    toPlayerLog($mysqli,"1 Heiltrank verwendet",$eigeneID);
-                                    toGameLog($mysqli,"Die Hexe heilt das Opfer der Werwölfe");
+                                    toPlayerLog($mysqli,"1 Heiltrank verwendet.",$eigeneID);
+                                    toGameLog($mysqli,"Die Hexe heilt das Opfer der Werwölfe.");
                                   }
                                   else
                                   {
@@ -887,8 +887,8 @@ p#liste {
                                     $todestraenkeNeu = (int)$eigeneAssoc['hexeTodestraenke']-1;
                                     $hexenOpfer = (int)$_POST['toeten'];
                                     $mysqli->Query("UPDATE $spielID"."_spieler SET hexeTodestraenke = $todestraenkeNeu, hexenOpfer = $hexenOpfer WHERE id = $eigeneID");
-                                    toPlayerLog($mysqli,"1 Todestrank verwendet für Spieler ".getName($mysqli,$hexenOpfer),$eigeneID);
-                                    toGameLog($mysqli,"Die Hexe verwendet einen Todestrank, um ".getName($mysqli,$hexenOpfer)." zu töten");
+                                    toPlayerLog($mysqli,"1 Todestrank verwendet für Spieler ".getName($mysqli,$hexenOpfer),$eigeneID).".";
+                                    toGameLog($mysqli,"Die Hexe verwendet einen Todestrank, um ".getName($mysqli,$hexenOpfer)." zu töten.");
                                   }
                                   else
                                   {
@@ -1248,8 +1248,8 @@ p#liste {
                         {
                           //Zeit abgelaufen
                           endeDerAbstimmungEinfacheMehrheit(-1,$mysqli);
-                          toGameLog($mysqli,"Die Versammlung des Dorfes konnte sich nicht auf einen Spieler einigen, den sie töten will");
-                          toAllPlayerLog($mysqli,"Die Versammlung des Dorfes konnte sich nicht auf einen Spieler einigen, den sie töten will");
+                          toGameLog($mysqli,"Die Versammlung des Dorfes konnte sich nicht auf einen Spieler einigen, den sie töten will.");
+                          toAllPlayerLog($mysqli,"Die Versammlung des Dorfes konnte sich nicht auf einen Spieler einigen, den sie töten will.");
                         }
                         else
                         {
@@ -1382,8 +1382,8 @@ p#liste {
                         {
                           //Zeit abgelaufen
                           endeDerStichwahl(-1,$mysqli);
-                          toGameLog($mysqli,"Das Dorf konnte sich in der Stichwahl nicht auf einen Spieler einigen, den sie töten wollen");
-                          toAllPlayerLog($mysqli,"Das Dorf konnte sich auch in der Stichwahl nicht auf einen Spieler einigen, den sie töten wollen");
+                          toGameLog($mysqli,"Das Dorf konnte sich in der Stichwahl nicht auf einen Spieler einigen, den es töten will.");
+                          toAllPlayerLog($mysqli,"Das Dorf konnte sich auch in der Stichwahl nicht auf einen Spieler einigen, den es töten will.");
                         }
                         else
                         {
@@ -1422,8 +1422,8 @@ p#liste {
                               {
                                 //Dieser Spieler hat die Mehrheit
                                 $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1");
-                                toGameLog($mysqli,getName($mysqli,$id)." wurde bei der Abstimmung zum Tode verurteilt, Stimmen: $text");
-                                toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde vom Dorf zum Tode verurteilt, Stimmen: $text");
+                                toGameLog($mysqli,getName($mysqli,$id)." wurde bei der Abstimmung zum Tode verurteilt, mit den Stimmen: $text");
+                                toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde vom Dorf zum Tode verurteilt, mit den Stimmen: $text");
                                 endeDerStichwahl($id,$mysqli); 
                                 break;
                               }
@@ -2735,7 +2735,7 @@ function spielStarten($mysqli)
       if ($aktBonus + 1 <= $zufaelligeAuswahlBonus + 2 && $aktBonus + 1 >= $zufaelligeAuswahlBonus && $dorfbewohnerzahlN >= 0)
       {
         //Bonus ist um max. 1 abweichend --> succes!
-        toGameLog($mysqli,"Zufällige Verteilung der Charaktere vorgenommen mit Bonus ". $aktBonus);
+        toGameLog($mysqli,"Zufällige Verteilung der Charaktere vorgenommen mit Bonus ". $aktBonus . ".");
         $werwolfzahl = $werwolfzahlN;
         $hexenzahl = $hexenzahlN;
         $jaegerzahl = $jaegerzahlN;
@@ -2756,7 +2756,7 @@ function spielStarten($mysqli)
     {
       //Verteilung fehlgeschlagen!
       //Notverteilung
-      toGameLog($mysqli,"Zufällige Verteilung der Charaktere fehlgeschlagen. Teile nur Werwölfe aus");
+      toGameLog($mysqli,"Zufällige Verteilung der Charaktere fehlgeschlagen. Teile nur Werwölfe aus.");
       $werwolfzahl = round($spielerzahl/6)+1;
       $hexenzahl = 0;
       $jaegerzahl = 0;
@@ -3097,7 +3097,7 @@ function toeteSpieler($mysqli, $spielerID)
   {
     //Der Jäger wurde getötet
     $mysqli->Query("UPDATE $spielID"."_spieler SET jaegerDarfSchiessen = 1 WHERE id = $spielerID");
-    toGameLog($mysqli,"Der Jäger wurde getötet");
+    toGameLog($mysqli,"Der Jäger wurde getötet.");
   }
   
   //Nachschauen, ob er der Bürgermeister ist ... und wir Bürgermeister weitergeben aktiviert haben....
@@ -3135,7 +3135,7 @@ function toeteSpieler($mysqli, $spielerID)
     $verliebtRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1 AND id = ".$temp['verliebtMit']);
     if ($verliebtRes->num_rows > 0)
     {
-      toGameLog($mysqli,"Der Verliebte stirbt mit dem anderen");
+      toGameLog($mysqli,"Der Verliebte stirbt mit dem anderen.");
       //Er lebt noch --> töte ihn
       toeteSpieler($mysqli,$temp['verliebtMit']);
     }
@@ -3202,10 +3202,10 @@ function amorGueltig($mysqli,$wahl1,$wahl2)
   //Die Wahl scheint gültig zu sein--> eintragen
   $mysqli->Query("UPDATE $spielID"."_spieler SET verliebtMit = $wahl1 WHERE id = $wahl2");
   $mysqli->Query("UPDATE $spielID"."_spieler SET verliebtMit = $wahl2 WHERE id = $wahl1");
-  toPlayerLog($mysqli,"Sie haben ".getName($mysqli,$wahl1)." mit ".getName($mysqli,$wahl2)." verliebt",$eigeneID);
-  toGameLog($mysqli,"Amor hat ".getName($mysqli,$wahl1)." mit ".getName($mysqli,$wahl2)." verliebt");
-  toPlayerLog($mysqli,"Amor hat Sie mit ".getName($mysqli,$wahl1). " verliebt",$wahl2);
-  toPlayerLog($mysqli,"Amor hat Sie mit ".getName($mysqli,$wahl2). " verliebt",$wahl1);
+  toPlayerLog($mysqli,"Sie haben ".getName($mysqli,$wahl1)." mit ".getName($mysqli,$wahl2)." verliebt.",$eigeneID);
+  toGameLog($mysqli,"Amor hat ".getName($mysqli,$wahl1)." mit ".getName($mysqli,$wahl2)." verliebt.");
+  toPlayerLog($mysqli,"Amor hat Sie mit ".getName($mysqli,$wahl1). " verliebt.",$wahl2);
+  toPlayerLog($mysqli,"Amor hat Sie mit ".getName($mysqli,$wahl2). " verliebt.",$wahl1);
   return true;
 }
 
@@ -3250,11 +3250,11 @@ function spionSehe($mysqli, $id, $identitaet)
   $strIdentitaet = nachtidentitaetAlsString($identitaet);
   if ($spielerAssoc['nachtIdentitaet']==$identitaet)
   {
-     $text = $spielerAssoc['name']." ist ". $strIdentitaet;
+     $text = $spielerAssoc['name']." ist ". $strIdentitaet .".";
   }
   else
   {
-    $text = $spielerAssoc['name']." ist nicht ". $strIdentitaet;
+    $text = $spielerAssoc['name']." ist nicht ". $strIdentitaet .".";
   }
   echo "<h1 >$text</h1>";
   
@@ -3381,7 +3381,7 @@ function seherSehe($mysqli, $id)
   
   //Schreibe es auch ins playerlog, damit es der Spieler nachlesen kann
   toPlayerLog($mysqli, $spielerAssoc['name']." = $identitaet",$eigeneID);
-  toGameLog($mysqli,"Der Seher/Die Seherin(".getName($mysqli,$eigeneID).") sieht die Nachtidentitaet von Spieler ".$spielerAssoc['name']." = $identitaet");
+  toGameLog($mysqli,"Der Seher/Die Seherin(".getName($mysqli,$eigeneID).") sieht die Nachtidentitaet von Spieler ".$spielerAssoc['name']." = $identitaet .");
   
   //Setze mich noch auf bereit ;)
   $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1 WHERE id = $eigeneID");
@@ -3427,8 +3427,8 @@ function beschuetzerAuswahl($mysqli,$id)
   
   $gameAssoc = gameAssoc($mysqli);
   //Schreibe es auch ins playerlog, damit es der Spieler nachlesen kann
-  toPlayerLog($mysqli, "In Nacht ".$gameAssoc['nacht']." beschützen Sie ".getName($mysqli,$id),$eigeneID);
-  toGameLog($mysqli,"Der Beschützer/Die Beschützerin(".getName($mysqli,$eigeneID).") beschützt in Nacht ".$gameAssoc['nacht']." ".getName($mysqli,$id));
+  toPlayerLog($mysqli, "In Nacht ".$gameAssoc['nacht']." beschützen Sie ".getName($mysqli,$id).".",$eigeneID);
+  toGameLog($mysqli,"Der Beschützer/Die Beschützerin(".getName($mysqli,$eigeneID).") beschützt in Nacht ".$gameAssoc['nacht']." ".getName($mysqli,$id).".");
   
   //Setze mich noch auf bereit ;)
   setBereit($mysqli,$eigeneID,1);
@@ -3538,7 +3538,7 @@ function hexeInitialisieren($mysqli)
     //Schreibe es auch in das Hexe log
     $nacht = $gameAss['nacht'];
     $name = getName($mysqli,$gameAss['werwolfopfer']);
-    toPlayerLog($mysqli,"In Nacht $nacht wählten die Werwölfe $name als Opfer",$eigeneID);
+    toPlayerLog($mysqli,"In Nacht $nacht wählten die Werwölfe $name als Opfer.",$eigeneID);
     
     if ($heiltraenke > 0)
     {
@@ -3818,8 +3818,8 @@ function checkeSiegbedingungen($mysqli)
     if ($dorfbewohnerRes->num_rows <= 0)
     {
       //Die Werwölfe haben gewonnen ...
-      toGameLog($mysqli,"Die Werwölfe haben gewonnen");
-      toAllPlayerLog($mysqli,"Die Werwölfe haben gewonnen");
+      toGameLog($mysqli,"Die Werwölfe haben gewonnen.");
+      toAllPlayerLog($mysqli,"Die Werwölfe haben gewonnen.");
       $mysqli->Query("UPDATE $spielID"."_game SET spielphase = ". PHASESIEGEREHRUNG .", tagestext = 'Die Werwölfe haben gewonnen'");
       //alle müssen reloaden
       $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1, bereit = 0");
@@ -3830,8 +3830,8 @@ function checkeSiegbedingungen($mysqli)
   else
   {
     //Die Dorfbewohner haben gewonnen
-    toGameLog($mysqli,"Die Dorfbewohner haben gewonnen");
-    toAllPlayerLog($mysqli,"Die Dorfbewohner haben gewonnen");
+    toGameLog($mysqli,"Die Dorfbewohner haben gewonnen.");
+    toAllPlayerLog($mysqli,"Die Dorfbewohner haben gewonnen.");
     $mysqli->Query("UPDATE $spielID"."_game SET spielphase = ". PHASESIEGEREHRUNG .", tagestext = 'Die Dorfbewohner haben gewonnen'");
     //alle müssen reloaden
     $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1, bereit = 0");
@@ -3848,8 +3848,8 @@ function checkeSiegbedingungen($mysqli)
     if ($alleRes->num_rows <= 2)
     {
       //Die verliebten haben gewonnen!
-      toGameLog($mysqli,"Die Verliebten haben gewonnen");
-      toAllPlayerLog($mysqli,"Die Verliebten haben gewonnen");
+      toGameLog($mysqli,"Die Verliebten haben gewonnen.");
+      toAllPlayerLog($mysqli,"Die Verliebten haben gewonnen.");
       $mysqli->Query("UPDATE $spielID"."_game SET spielphase = ". PHASESIEGEREHRUNG .", tagestext = 'Die Verliebten haben gewonnen'");
       //alle müssen reloaden
       $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1, bereit = 0");
