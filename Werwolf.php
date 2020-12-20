@@ -419,7 +419,7 @@ p#liste {
                         $eigeneAssoc = eigeneAssoc($mysqli);
                         if ($eigeneAssoc['bereit']==1)
                         {
-                          warteAufAndere();
+                          warteAufAndere($mysqli);
                           $pageReload = true;
                         }
                         else
@@ -435,7 +435,7 @@ p#liste {
                               }
                               else
                               {
-                                warteAufAndere();
+                                warteAufAndere($mysqli);
                                 $pageReload = true;
                                 setBereit($mysqli,$eigeneID,1);
                                 phaseBeendenWennAlleBereit(PHASENACHT1,$mysqli);
@@ -453,7 +453,7 @@ p#liste {
                             {
                               //der Button wurde bereits geklickt
                               setBereit($mysqli,$eigeneID,1);
-                              warteAufAndere();
+                              warteAufAndere($mysqli);
                               $pageReload = true;
                               phaseBeendenWennAlleBereit(PHASENACHT1,$mysqli);
                             }
@@ -472,7 +472,7 @@ p#liste {
                         $eigeneAssoc = eigeneAssoc($mysqli);
                         if ($eigeneAssoc['bereit']==1)
                         {
-                          warteAufAndere();
+                          warteAufAndere($mysqli);
                           $pageReload = true;
                         }
                         else
@@ -482,7 +482,7 @@ p#liste {
                             if (isset($_POST['verliebteWeiter']))
                             {
                               setBereit($mysqli,$eigeneID,1);
-                              warteAufAndere();
+                              warteAufAndere($mysqli);
                               $pageReload = true;
                               phaseBeendenWennAlleBereit(PHASENACHT2,$mysqli);
                             }
@@ -510,7 +510,7 @@ p#liste {
                             {
                               //der Button wurde bereits geklickt
                               setBereit($mysqli,$eigeneID,1);
-                              warteAufAndere();
+                              warteAufAndere($mysqli);
                               $pageReload = true;
                               phaseBeendenWennAlleBereit(PHASENACHT2,$mysqli);
                             }
@@ -535,7 +535,7 @@ p#liste {
                         //Falls der Spieler bereit ist, brauche ich nur noch warten auf andere anzeigen
                         if ($spielerAssoc['bereit']==1)
                         {
-                          warteAufAndere();
+                          warteAufAndere($mysqli);
                           $pageReload = true;
                         }
                         else
@@ -555,7 +555,7 @@ p#liste {
                               else
                               {
                                 //Der Seher hat erfolgreich ausgewählt --> Schaue, ob wir die Phase schon beenden können
-                                warteAufAndere();
+                                warteAufAndere($mysqli);
                                 $pageReload = true;
                                 phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli);
                               }
@@ -579,7 +579,7 @@ p#liste {
                               else
                               {
                                 //Gültiger Zug!
-                                warteAufAndere();
+                                warteAufAndere($mysqli);
                                 $pageReload = true;
                                 phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli);
                               }
@@ -602,7 +602,7 @@ p#liste {
                               else
                               {
                                 //Der Beschützer hat erfolgreich ausgewählt
-                                warteAufAndere();
+                                warteAufAndere($mysqli);
                                 $pageReload = true;
                                 phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli);
                               }
@@ -629,7 +629,7 @@ p#liste {
                                 {
                                   //Erfolgreich
                                   setBereit($mysqli,$eigeneID,1);
-                                  warteAufAndere();
+                                  warteAufAndere($mysqli);
                                   $pageReload = true;
                                   phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli);
                                 }
@@ -638,7 +638,7 @@ p#liste {
                               {
                                 //Diese Runde nicht auswählen
                                 setBereit($mysqli,$eigeneID,1);
-                                warteAufAndere();
+                                warteAufAndere($mysqli);
                                 $pageReload = true;
                                 phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli);
                               }
@@ -655,7 +655,7 @@ p#liste {
                               {
                                 //der Button wurde bereits geklickt
                                 setBereit($mysqli,$eigeneID,1);
-                                warteAufAndere();
+                                warteAufAndere($mysqli);
                                 $pageReload = true;
                                 phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli);
                               }
@@ -819,7 +819,7 @@ p#liste {
                             {
                               //der Button wurde bereits geklickt
                               setBereit($mysqli,$eigeneID,1);
-                              warteAufAndere();
+                              warteAufAndere($mysqli);
                               $pageReload = true;
                               phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli);
                             }
@@ -841,7 +841,7 @@ p#liste {
                         //Falls der Spieler bereit ist, brauche ich nur noch warten auf andere anzeigen
                         if ($spielerAssoc['bereit']==1)
                         {
-                          warteAufAndere();
+                          warteAufAndere($mysqli);
                           $pageReload = true;
                         }
                         else
@@ -922,7 +922,7 @@ p#liste {
                               else
                               {
                                 //Gültiger Zug!
-                                warteAufAndere();
+                                warteAufAndere($mysqli);
                                 $pageReload = true;
                                 phaseBeendenWennAlleBereit(PHASENACHT4,$mysqli);
                               }
@@ -941,7 +941,7 @@ p#liste {
                                 {
                                   //der Button wurde bereits geklickt
                                   setBereit($mysqli,$eigeneID,1);
-                                  warteAufAndere();
+                                  warteAufAndere($mysqli);
                                   $pageReload = true;
                                   phaseBeendenWennAlleBereit(PHASENACHT4,$mysqli);
                                 }
@@ -960,7 +960,7 @@ p#liste {
                             {
                               //der Button wurde bereits geklickt
                               setBereit($mysqli,$eigeneID,1);
-                              warteAufAndere();
+                              warteAufAndere($mysqli);
                               $pageReload = true;
                               phaseBeendenWennAlleBereit(PHASENACHT4,$mysqli);
                             }
@@ -1022,7 +1022,7 @@ p#liste {
                               $pageReload = true;
                               setBereit($mysqli,$eigeneID,1);
                               phaseBeendenWennAlleBereit(PHASETOTEBEKANNTGEBEN,$mysqli);
-                              warteAufAndere();
+                              warteAufAndere($mysqli);
                             }
                             else
                             {
@@ -1037,7 +1037,7 @@ p#liste {
                               }
                               else
                               {
-                                warteAufAndere();
+                                warteAufAndere($mysqli);
                               }
                             }  
                           }
@@ -1047,7 +1047,7 @@ p#liste {
                             $pageReload = true;
                             setBereit($mysqli,$eigeneID,1);
                             phaseBeendenWennAlleBereit(PHASETOTEBEKANNTGEBEN,$mysqli);
-                            warteAufAndere();
+                            warteAufAndere($mysqli);
                           }
                         }
                         else
@@ -1058,7 +1058,7 @@ p#liste {
                               $pageReload = true;
                               setBereit($mysqli,$eigeneID,1);
                               phaseBeendenWennAlleBereit(PHASETOTEBEKANNTGEBEN,$mysqli);
-                              warteAufAndere();
+                              warteAufAndere($mysqli);
                             }
                             else
                             {
@@ -1073,7 +1073,7 @@ p#liste {
                               }
                               else
                               {
-                                warteAufAndere();
+                                warteAufAndere($mysqli);
                               }
                             } 
                           
@@ -3143,10 +3143,22 @@ function toeteSpieler($mysqli, $spielerID)
   checkeSiegbedingungen($mysqli);
 }
 
-function warteAufAndere()
+function warteAufAndere($mysqli)
 {
   //Zeigt das warteAufAnder an, damit es bei jedem gleich aussieht
   echo "<h3 >Warte auf andere Spieler</h3>";
+
+  //Output the players we are waiting for
+  $spielID = $_COOKIE['SpielID'];
+  $nichtBereitResult = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE bereit = 0 AND lebt = 1");
+  if (!is_bool($nichtBereitResult)) {
+    while($row = $nichtBereitResult->fetch_row()){
+      if (count($row) > 1) {
+        error_log($row[1]);
+        echo("$row[1]\t");
+      }
+    }
+  }
 }
 
 function dorfbewohnerWeiterschlafen()
