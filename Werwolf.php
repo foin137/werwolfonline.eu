@@ -1645,7 +1645,7 @@ p#liste {
                   {
                    //Name gültig
                     //Finde eine freie ID
-                    for ($i = 1; $i <= 50; $i++)
+                    for ($i = 1; $i <= _MAXPLAYERS; $i++)
                     {
                       $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $i");
                       //echo "SELECT * FROM $spielID"."_spieler WHERE id = $i";

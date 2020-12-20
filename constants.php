@@ -3,6 +3,7 @@
 define("_VERSION","v1.2.4");
 define("_LISTMAXRELOADTIME",3000);
 define("_WAITINGFOROTHERSTIME",30); //Innerhalb dieser Sekunden bleibt verborgen, auf wen noch gewartet wird.
+define("_MAXPLAYERS",50);
 
 //Phasen 
 define ("PHASESETUP",0);
