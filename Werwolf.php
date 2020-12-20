@@ -1595,6 +1595,7 @@ p#liste {
                       `list_lebe_aktualisiert` BIGINT DEFAULT 0,
                       `list_tot` LONGTEXT,
                       `list_tot_aktualisiert` BIGINT DEFAULT 0,
+                      `waiting_for_others_time` BIGINT,
                       `letzterAufruf` BIGINT
                       ) ;";
                     $mysqli->Query($sql2);
@@ -1644,7 +1645,7 @@ p#liste {
                   {
                    //Name gültig
                     //Finde eine freie ID
-                    for ($i = 1; $i <= 50; $i++)
+                    for ($i = 1; $i <= _MAXPLAYERS; $i++)
                     {
                       $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $i");
                       //echo "SELECT * FROM $spielID"."_spieler WHERE id = $i";
@@ -2885,9 +2886,13 @@ function phaseInitialisieren($phase,$mysqli)
   {
     //Neue verliebte ... Setze alle verliebten auf -1
     $mysqli->Query("UPDATE $spielID"."_spieler SET verliebtMit = -1");
+    $waiting_for_others_time = time() + _WAITINGFOROTHERSTIME;
+    $mysqli->Query("UPDATE $spielID"."_game SET `waiting_for_others_time` = $waiting_for_others_time");
   }
   elseif ($phase == PHASENACHT2)
   {
+    $waiting_for_others_time = time() + _WAITINGFOROTHERSTIME;
+    $mysqli->Query("UPDATE $spielID"."_game SET `waiting_for_others_time` = $waiting_for_others_time");
   }
   elseif ($phase == PHASENACHT3)
   {
@@ -2917,7 +2922,13 @@ function phaseInitialisieren($phase,$mysqli)
         $countdownAb = time();
       $mysqli->Query("UPDATE $spielID"."_spieler SET countdownBis = $countdownBis, countdownAb = $countdownAb WHERE (nachtIdentitaet = ".CHARWERWOLF." OR nachtIdentitaet = ".CHARURWOLF.")");
     }
-    
+    $waiting_for_others_time = time() + _WAITINGFOROTHERSTIME;
+    $mysqli->Query("UPDATE $spielID"."_game SET `waiting_for_others_time` = $waiting_for_others_time");
+  }
+  elseif ($phase == PHASENACHT4)
+  {
+    $waiting_for_others_time = time() + _WAITINGFOROTHERSTIME;
+    $mysqli->Query("UPDATE $spielID"."_game SET `waiting_for_others_time` = $waiting_for_others_time");
   }
   elseif ($phase == PHASENACHTENDE)
   {
@@ -3148,14 +3159,19 @@ function warteAufAndere($mysqli)
   //Zeigt das warteAufAnder an, damit es bei jedem gleich aussieht
   echo "<h3 >Warte auf andere Spieler</h3>";
 
-  //Output the players we are waiting for
-  $spielID = $_COOKIE['SpielID'];
-  $nichtBereitResult = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE bereit = 0 AND lebt = 1");
-  if (!is_bool($nichtBereitResult)) {
-    while($row = $nichtBereitResult->fetch_row()){
-      if (count($row) > 1) {
-        error_log($row[1]);
-        echo("$row[1]\t");
+  //Output the players we are waiting for (if enough time has passed)
+  $gameAssoc = gameAssoc($mysqli);
+  if ($gameAssoc['waiting_for_others_time'] < time())
+  {
+    $spielID = (int)$_COOKIE['SpielID'];
+    $nichtBereitResult = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE bereit = 0 AND lebt = 1");
+    if (!is_bool($nichtBereitResult)) {
+      echo("Warte noch auf: ");
+      while($row = $nichtBereitResult->fetch_row()){
+        if (count($row) > 1) {
+          error_log($row[1]);
+          echo("$row[1]\t");
+        }
       }
     }
   }
@@ -4236,7 +4252,6 @@ function getDorfbewohnerText()
 Erklärungen:
 Zu den Datenbank-Einträgen:
 [ID]_Game
-
 Spielphase  //ALT, jetzt über Konstanten gelöst
 0: Setup -> Spieler suchen  (PHASESETUP)
 1: Spielsetup -> jeder muss bestätigen, dass er dabei ist (PHASESPIELSETUP)
@@ -4253,53 +4268,39 @@ Spielphase  //ALT, jetzt über Konstanten gelöst
 12: Tag, Stichwahl der Abstimmung (PHASESTICHWAHL)
 13: Tag, nach Abstimmung (PHASENACHABSTIMMUNG)
 14: Siegerehrung (PHASESIEGEREHRUNG)
-
 charaktereAufdecken
 0: Die Charaktere werden nicht aufgedeckt
 1: Die Charaktere werden aufgedeckt
-
 buergermeisterWeitergeben
 0: Beim Tod des Bürgermeisters wird ein neuer gewählt.
 1: Beim Tod des Bürgermeisters entscheidet der Bürgermeister, wer sein Nachfolger wird.
-
 werwolfzahl
 Gibt die Anzahl der Werwölfe beim Spielsetup an
-
 hexenzahl
 Gibt die Anzahl der Hexen beim Spielsetup an
-
 seherzahl
 Gibt die Anzahl der Seher beim Spielsetup an
-
 jaegerzahl
 Gibt die Anzahl der Jäger beim Spielsetup an
-
 amorzahl
 Gibt die Anzahl der Amor(s) an (max 1)
-
 letzterAufruf
 gibt den letzten Aufruf an, kann später einmal verwendet werden, um alte Spiele zu löschen.
-
+waiting_for_others_time
+Gibt an, ab wann angezeigt wird, auf wen wir noch warten
 werwolfopfer
 gibt das Opfer der Werwölfe an
-
 log
 Eine Log-Datei des gesamten Spiels
 Diese Datei soll das Spiel nachvollziehbar machen
-
 Nacht
 gibt die Anzahl der Nächte seit Spielbeginn an
-
 tagestext
 Gibt den Text an, der in Phase 7 allen angezeigt wird
 = Diese Nacht wurden getötet:
 SpielerX
 SpielerZ
-
-
-
 [ID]_Spieler
-
 Nachtidentitaet
 0: keine (CHARKEIN)
 1: Dorfbewohner (CHARDORFBEWOHNER)
@@ -4315,35 +4316,25 @@ Nachtidentitaet
 11: Mordlustige(r), intern Idiot (CHARMORDLUSTIGER)
 12: Pazifist (CHARPAZIFIST)
 13: Alter Mann  (CHARALTERMANN)
-
 hexenOpfer
 Wen die Hexe töten will
-
 hexeHeilt
 0: Hexe heilt das Opfer der Werwölfe nicht
 1: Hexe heilt das Opfer der Werwölfe
-
 verliebtMit
 mit wem dieser Spieler vom Amor verliebt wurde
-
 jaegerDarfSchiessen
 0: Nichts Besonderes
 1: Der Jäger wurde getötet und darf jemanden mit in den Tod reißen
-
 buergermeisterDarfWeitergeben
 0: Nichts Besonderes
 1: Der Bürgermeister wurde getötet und gibt sein Amt weiter...
-
 playerlog
 Hier werden Sachen hineingeschrieben, die sich der Spieler wieder anschaun können soll
 z.B. als Seher wen er gesehen hat
-
 SESSION-Variablen Übersicht
 $_SESSION['SpielID'] gibt die ID des Spiels an
 $_SESSION['eigeneID'] gibt die eigene ID an
-
-
-
 ToDO:
 #1: DONE: Spieler mit gleichem Namen dürfen sich nicht in einem Spiel befinden  DONE
 #2: DONE: Verschiedene Texte der Dorfbewohner (einschlafen) DONE
@@ -4393,6 +4384,5 @@ ToDO:
 #45: DONE: Verbiete, dass sich jemand wie ein Charakter nennt (WERWOLF, HEXE, AMOR)
 #46: Bots hinzufügen, die von einem "BotController"="Spieler, der für refreshen zuständig ist" zB ein Laptop
 #47: DONE: Umstellen der Farben ermöglichen (v1.0.1, 30.12.2019)
-
 */
 ?>
