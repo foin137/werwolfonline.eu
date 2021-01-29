@@ -1588,6 +1588,8 @@ p#liste {
                       `dorfzusatz` INT ( 10 ) DEFAULT 10 ,
                       `dorfstichwahltimer` INT ( 10 ) DEFAULT 200 ,
                       `dorfstichwahlzusatz` INT ( 10 ) DEFAULT 5 ,
+                      `inaktivzeit` INT ( 10 ) DEFAULT 40 ,
+                      `inaktivzeitzusatz` INT ( 10 ) DEFAULT 0 ,
                       `tagestext` TEXT ,
                       `nacht` INT ( 5 ) DEFAULT 1 ,
                       `log` LONGTEXT ,
@@ -2326,6 +2328,10 @@ function spielRegeln($mysqli)
   $dorfstichwahlzusatz = $gameResAssoc['dorfstichwahlzusatz'];
   $zufaelligauswaehlen = $gameResAssoc['zufaelligeAuswahl'];
   $zufaelligeAuswahlBonus = $gameResAssoc['zufaelligeAuswahlBonus'];
+
+  $inaktivzeit = $gameResAssoc['inaktivzeit'];
+  $inaktivzeitzusatz = $gameResAssoc['inaktivzeitzusatz'];
+
   echo "
   <form action='Werwolf.php' method='post' id='gamesettings' name='auswahl'>
     <input type='hidden' name='editierenAuswahl' value=1 />
@@ -2421,6 +2427,9 @@ function spielRegeln($mysqli)
   echo "<span class='normal' ><label for='dorfstichwahltimerID'>Sekunden, bis die Stichwahl am Tag erfolglos ist: </label>
     <INPUT TYPE='number' NAME='dorfstichwahltimer' id='dorfstichwahltimerID' SIZE='2' VALUE=$dorfstichwahltimer MIN='30' MAX='3600'><br>
     <label for='dorfstichwahlzusatzID'>Zusätzliche Zeit pro Dorfbewohner: </label><INPUT TYPE='number' NAME='dorfstichwahlzusatz' id='dorfstichwahlzusatzID' SIZE='2' VALUE=$dorfstichwahlzusatz MIN='0' MAX='300'></span>"; 
+  echo "<span class='normal' ><label for='inaktivzeitID'>Sekunden, nach denen angezeigt wird, auf wen noch gewartet wird: </label>
+    <INPUT TYPE='number' NAME='inaktivzeit' id='inaktivzeitID' SIZE='2' VALUE=$inaktivzeit MIN='20' MAX='3600'><br>
+    <label for='inaktivzeitzusatzID'>Zusätzliche Zeit pro Spieler: </label><INPUT TYPE='number' NAME='inaktivzeitzusatz' id='inaktivzeitzusatzID' SIZE='2' VALUE=$inaktivzeitzusatz MIN='0' MAX='300'></span>"; 
   echo "</div><span align = 'center'><input type='submit' value = 'Speichern'/></span>";
   echo "</form>";
 }
@@ -2454,6 +2463,8 @@ function spielRegelnAnwenden($mysqli)
     $dorfzusatz = (int)$_POST['dorfzusatz'];
     $dorfstichwahltimer = (int)$_POST['dorfstichwahltimer'];
     $dorfstichwahlzusatz = (int)$_POST['dorfstichwahlzusatz'];
+    $inaktivzeit = (int)$_POST['inaktivzeit'];
+    $inaktivzeitzusatz = (int)$_POST['inaktivzeitzusatz'];
     $zufaelligeAuswahlBonus = (int)$_POST['zufaelligeAuswahlBonus'];
     $zufaelligauswaehlen = 0;
     if (isset($_POST['zufaelligauswaehlen']))
@@ -2510,7 +2521,9 @@ function spielRegelnAnwenden($mysqli)
      dorftimer = $dorftimer,
      dorfzusatz = $dorfzusatz,
      dorfstichwahltimer = $dorfstichwahltimer,
-     dorfstichwahlzusatz = $dorfstichwahlzusatz");
+     dorfstichwahlzusatz = $dorfstichwahlzusatz,
+     inaktivzeit = $inaktivzeit,
+     inaktivzeitzusatz = $inaktivzeitzusatz");
     //Fertig upgedated ;)
   }
 }
@@ -2886,12 +2899,12 @@ function phaseInitialisieren($phase,$mysqli)
   {
     //Neue verliebte ... Setze alle verliebten auf -1
     $mysqli->Query("UPDATE $spielID"."_spieler SET verliebtMit = -1");
-    $waiting_for_others_time = time() + _WAITINGFOROTHERSTIME;
+    $waiting_for_others_time = time() + get_waiting_for_others_time($mysqli);
     $mysqli->Query("UPDATE $spielID"."_game SET `waiting_for_others_time` = $waiting_for_others_time");
   }
   elseif ($phase == PHASENACHT2)
   {
-    $waiting_for_others_time = time() + _WAITINGFOROTHERSTIME;
+    $waiting_for_others_time = time() + get_waiting_for_others_time($mysqli);
     $mysqli->Query("UPDATE $spielID"."_game SET `waiting_for_others_time` = $waiting_for_others_time");
   }
   elseif ($phase == PHASENACHT3)
@@ -2922,12 +2935,12 @@ function phaseInitialisieren($phase,$mysqli)
         $countdownAb = time();
       $mysqli->Query("UPDATE $spielID"."_spieler SET countdownBis = $countdownBis, countdownAb = $countdownAb WHERE (nachtIdentitaet = ".CHARWERWOLF." OR nachtIdentitaet = ".CHARURWOLF.")");
     }
-    $waiting_for_others_time = time() + _WAITINGFOROTHERSTIME;
+    $waiting_for_others_time = time() + get_waiting_for_others_time($mysqli);
     $mysqli->Query("UPDATE $spielID"."_game SET `waiting_for_others_time` = $waiting_for_others_time");
   }
   elseif ($phase == PHASENACHT4)
   {
-    $waiting_for_others_time = time() + _WAITINGFOROTHERSTIME;
+    $waiting_for_others_time = time() + get_waiting_for_others_time($mysqli);
     $mysqli->Query("UPDATE $spielID"."_game SET `waiting_for_others_time` = $waiting_for_others_time");
   }
   elseif ($phase == PHASENACHTENDE)
@@ -3093,6 +3106,21 @@ function phaseInitialisieren($phase,$mysqli)
       $countdownAb = time();
     $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = -1, countdownBis = $countdownBis, countdownAb = $countdownAb WHERE lebt = 1");
   }
+}
+
+function get_waiting_for_others_time($mysqli)
+{
+  //Gibt die Anzahl der Sekunden zurück, wie lange wir warten wollen, bis wir anzeigen, auf wen wir noch warten.
+  $spielID = (int)$_COOKIE['SpielID'];
+  if ($result = $mysqli->query("SELECT * FROM $spielID"."_spieler"))
+  {
+    $spielerzahl = $result->num_rows;
+    if ($g = gameAssoc($mysqli))
+    {
+      return $g['inaktivzeit'] + $g['inaktivzeitzusatz'] * $spielerzahl;
+    }
+  }
+  return 0;
 }
 
 function toeteSpieler($mysqli, $spielerID)
