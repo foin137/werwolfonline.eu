@@ -490,7 +490,7 @@ p#liste {
                             {
                               //Zeige an, mit wem ich verliebt bin
                               echo "<form action='Werwolf.php' method='post'>";
-                              echo "<p class='normal' >Der Pfeil des Amor, der nie sein Ziel verfehlt, trifft Sie und sie verlieben sich unsterblich ...</p>";
+                              echo "<p class='normal' >Der Pfeil des Amor, der nie sein Ziel verfehlt, trifft Sie und Sie verlieben sich unsterblich ...</p>";
                               echo "<p >Sie sind verliebt mit ".getName($mysqli,$eigeneAssoc['verliebtMit'])."</p>";
                               echo "<p class='normal' >Sie spielen nun gemeinsam mit Ihrem Geliebten, gehören Sie unterschiedlichen Gruppierungen an,
                               gewinnen Sie nur, wenn Sie alle anderen Spieler töten. Ansonsten gewinnen Sie wie gewohnt mit Ihrer Gruppierung (Dorfbewohner, Werwölfe)</p>";
