@@ -3937,9 +3937,14 @@ function diesesSpielLoeschenButton()
 }
 function aus_spiel_entfernen($spielerID, $mysqli)
 {
-  $spielID = $_COOKIE['SpielID'];
+  $spielID = (int)$_COOKIE['SpielID'];
   $spielerID = (int)$spielerID;
-  $mysqli->Query("UPDATE $spielID"."_spieler SET lebt = 0 WHERE id = $spielerID");   
+  $mysqli->Query("UPDATE $spielID"."_spieler SET lebt = 0 WHERE id = $spielerID");
+  //Überprüfe, ob sonst schon alle bereit sind
+  if ($g = gameAssoc($mysqli))
+  {
+    phaseBeendenWennAlleBereit($g['spielphase'],$mysqli);
+  }
 }
 
 function alleReloadAusser($spielerID,$mysqli)
