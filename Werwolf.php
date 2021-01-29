@@ -3940,9 +3940,12 @@ function setBereit($mysqli,$spielerID,$bereit)
 function gameAssoc($mysqli)
 {
   $spielID = $_COOKIE['SpielID'];
-  $gameRes = $mysqli->Query("SELECT * FROM $spielID"."_game");
-  $gameA = $gameRes->fetch_assoc();
-  return $gameA;
+  if ($gameRes = $mysqli->Query("SELECT * FROM $spielID"."_game"))
+  {
+    $gameA = $gameRes->fetch_assoc();
+    return $gameA;
+  }
+  return false;
 }
 
 function eigeneAssoc($mysqli)
@@ -3959,9 +3962,12 @@ function getName($mysqli, $spielerID)
   //Gibt den Namen des Spielers mit der $spielerID zurück
   $spielID = $_COOKIE['SpielID'];
   $spielerID = (int)$spielerID;
-  $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $spielerID");
-  $temp = $res->fetch_assoc();
-  return $temp['name'];
+  if ($res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $spielerID"))
+  {
+    $temp = $res->fetch_assoc();
+    return $temp['name'];
+  }
+  return "Unknown";
 }
 
 function getGesinnung($identitaet)
@@ -4092,14 +4098,16 @@ function toGameLog($mysqli,$logeintrag)
 {
   //Fügt dem gamelog den $logeintrag hinzu
   $spielID = $_COOKIE['SpielID'];
-  $gameAssoc = gameAssoc($mysqli);
-  $aktLog = $gameAssoc['log'];
-  $neuLog = $aktLog.date("H:i:s").": ".$logeintrag."<br>";
-  $neuLog = str_replace("'",'"',$neuLog); //ersetze alle ' mit "
-  $stmt = $mysqli->prepare("UPDATE $spielID"."_game SET log = ?");
-  $stmt->bind_param("s",$neuLog);
-  $stmt->execute();
-  $stmt->close();
+  if ($gameAssoc = gameAssoc($mysqli))
+  {
+    $aktLog = $gameAssoc['log'];
+    $neuLog = $aktLog.date("H:i:s").": ".$logeintrag."<br>";
+    $neuLog = str_replace("'",'"',$neuLog); //ersetze alle ' mit "
+    $stmt = $mysqli->prepare("UPDATE $spielID"."_game SET log = ?");
+    $stmt->bind_param("s",$neuLog);
+    $stmt->execute();
+    $stmt->close();
+  }
 }
 
 function toPlayerLog($mysqli, $logeintrag, $spieler)
