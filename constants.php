@@ -1,6 +1,6 @@
 <?php
 //Constants
-define("_VERSION","v1.2.5");
+define("_VERSION","v1.2.6");
 define("_LISTMAXRELOADTIME",3000);
 define("_MAXPLAYERS",50);
 
