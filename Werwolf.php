@@ -2,7 +2,7 @@
 <HTML>
 <head>
 <title>Werwölfe</title>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" /> 
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Cache-Control" content="no-cache">
@@ -28,7 +28,7 @@ if (isset($_COOKIE['developer']))
 if (isset($_COOKIE['back_color_n_r']) && isset ($_COOKIE['back_color_n_g']) && isset ($_COOKIE['back_color_n_b']) && isset ($_COOKIE['back_color_d_r']) && isset ($_COOKIE['back_color_d_g']) && isset ($_COOKIE['back_color_d_b']) && isset ($_COOKIE['color_p_r'])  && isset ($_COOKIE['color_p_g']) && isset ($_COOKIE['color_p_b']) && isset ($_COOKIE['color_n_r'])  && isset ($_COOKIE['color_n_g']) && isset ($_COOKIE['color_n_b']))
 {
     try{
-    
+
       $c_back_n_r = $_COOKIE['back_color_n_r'];
       $c_back_n_g = $_COOKIE['back_color_n_g'];
       $c_back_n_b = $_COOKIE['back_color_n_b'];
@@ -106,8 +106,8 @@ p#liste {
 </section>
 <section id="gameboard">
 <?php
-  include "includes.php"; //Datenbank
-  include "constants.php"; //Hier werden Konstanten für Phasen und Charaktere definiert
+  include "includes/includes.php"; //Datenbank
+  include "includes/constants.php"; //Hier werden Konstanten für Phasen und Charaktere definiert
   $pageReload = false;
   $listReload = false;
   $aktBeiTime = false; //Bei True aktualisiert der Browser bei Ablauf des Timers
@@ -117,8 +117,8 @@ p#liste {
   $timerAb = 0; //Ab wann Timer und Text angezeigt werdne (Sekunden bis zu dem Zeitpunkt)
   $timerText = ""; //Welcher Text vor dem Timer angezeigt werden soll
   $logButtonAnzeigen = true;
-  
-  
+
+
       //Schauen, ob wir uns bereits in einem Spiel befinden!
       if (isset($_COOKIE['SpielID']) && isset($_COOKIE['eigeneID']))
       {
@@ -135,7 +135,7 @@ p#liste {
               aus_spiel_entfernen((int)$eigeneID,$mysqli);
               toGameLog($mysqli, getName($mysqli,$eigeneID). " hat das Spiel verlassen.");
               //Cookies löschen
-              setcookie ("SpielID", 0, time()-172800); 
+              setcookie ("SpielID", 0, time()-172800);
               setcookie ("eigeneID",0, time()-172800);
               start();
             }
@@ -150,17 +150,17 @@ p#liste {
               $spielerResult = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID AND verifizierungsnr = ".(int)$_COOKIE['verifizierungsnr']);
               if ($spielerResult->num_rows >= 1)
               {
-                
+
                 //Zuallererst einmal den letzten Zugriff loggen:
                 $mysqli->Query("UPDATE $spielID"."_game SET letzterAufruf = ".time());
                 //Wir befinden uns bereits in einem Spiel
-                
+
                 //Dass wir aber nicht ohne Grund reloaden, setzen wir für uns selbst reload auf false:
                 setReloadZero($eigeneID,$mysqli);
                 //echo "<p algin='center' class='normal'>Du befindest dich bereits in einem Spiel, Name: ".getName($mysqli,$eigeneID)."</p>";
                 $myname = getName($mysqli,$eigeneID);
                 echo "<div id='playername'><p class='normal' >Name: ". $myname ."</p></div>";
-                
+
                 //Nachschauen, ob ich Bürgermeister bin ... Dann nämlich anschreiben ...
                 $buergermRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE buergermeister = 1");
                 if ($buergermRes->num_rows > 0)
@@ -172,7 +172,7 @@ p#liste {
                     echo "<p  class='normal'>Sie sind Bürgermeister</p>";
                   }
                 }
-                
+
                 //Vielleicht will der Spielleiter jemanden entfernen?
                 if (isset($_POST['spieler_entfernen']) && isset($_POST['entfernenID']))
                 {
@@ -185,7 +185,7 @@ p#liste {
                         toAllPlayerLog($mysqli, $text);
                     }
                 }
-                
+
                 //Bevor wir noch auf die Phase schauen, schauen wir, ob irgendetwas unabhängig von der Phase ist
                 //wie zum Beispiel der Tod des Jägers
                 $jaegerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE jaegerDarfSchiessen = 1");
@@ -251,7 +251,7 @@ p#liste {
                     //echo $mysqli->error;
                     $gameResAssoc = $gameResult->fetch_assoc();
                     $phase = $gameResAssoc['spielphase'];
-                    
+
                     if ($phase == PHASENACHTBEGINN)
                     {
                       $displayTag = false; //bei true ändert sich der Hintergrund
@@ -272,7 +272,7 @@ p#liste {
                       $displayTag = true;
                       $displayFade = false;
                     }
-                    
+
                     //Nachschauen, ob ich noch lebe ;)
                     $ass = eigeneAssoc($mysqli);
                     if ($phase >= PHASENACHTBEGINN && $phase <= PHASENACHABSTIMMUNG && $ass['lebt'] == 0)
@@ -294,14 +294,14 @@ p#liste {
                         {
                           //Grundsätzlich sollte in dieser Phase jeder responden:
                           $pageReload = true;
-                          
+
                           //Zuerst die Regeln aktualisieren, falls sie bearbeitet wurden
                           if ($eigeneID == 0 && isset($_POST['editierenAuswahl']))
                             spielRegelnAnwenden($mysqli);
-                          
+
                           //Phase 0 = Setup und Spielersuchen -> Zeige daher eine Liste der Spieler an
                           echo "<BR><h2>$spielID</h2><BR><p class='normal' >Mit dieser Zahl können andere Ihrem Spiel beitreten!</p>";
-                          
+
                           //Der Spielleiter bekommt zusätzlich einen Button angezeigt, mit dem er die Einstellungen bearbeiten kann.
                           $eigRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID");
                           $eigAss = $eigRes->fetch_assoc();
@@ -318,7 +318,7 @@ p#liste {
                             <input type="submit" value = "Spiel starten ;)"/></p>
                             </form>';
                           }
-                          
+
                           //Zeige alle Spieler in einer Liste an--> Alt, wird jz via javascript gelöst
                           echo "<BR><h3>Spieler in diesem Spiel:</h3>";
                           $spieleranzahlQuery = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
@@ -327,11 +327,11 @@ p#liste {
                           echo "<form name='list'><div id='listdiv'></div></form>";
                           $listReload = true; //Dass unsere Liste refresht wird ;)
                           echo "<h3 >Spieleranzahl: $spielerzahl</h3>";
-                          
+
                           //Falls der Spielleiter das Spiel beginnenlassen will:
                           if (isset($_POST['spielStarten']))
                           {
-                            spielInitialisieren($mysqli,$spielerzahl);  
+                            spielInitialisieren($mysqli,$spielerzahl);
                           }
                         }
                       }
@@ -375,12 +375,12 @@ p#liste {
                           {
                             spielStarten($mysqli);
                           }
-                          
+
                           //Diese Liste wird mit javascript erstellt
                           echo "<form name='list'><div id='listdiv'></div></form>";
                           $listReload = true; //Dass unsere Liste refresht wird
                           echo ("<p >Warte auf andere Spieler ...</p>");
-                          
+
                           //Als Spielleiter sollte man das Spiel "ohne Rücksicht auf Verluste" beginnen können
                           if ($eigeneID == 0)
                           {
@@ -388,7 +388,7 @@ p#liste {
                               <input type="hidden" name="spielBeginnenOhneRuecksicht" value=1 />
                               <p class="normal" align="center">
                               <input type="submit" value = "Spiel beginnen ohne zu warten" onClick="if (confirm('Wollen Sie das Spiel wirklich starten, ohne auf alle zu warten. Wer noch nicht bereit ist, wird aus dem Spiel gelöscht')==false){return false;}"/></p>
-                            </form> 
+                            </form>
                               <?php
                           }
                         }
@@ -409,7 +409,7 @@ p#liste {
                         else
                         {
                           $mysqli->Query("UPDATE $spielID"."_game SET spielphase = ".PHASENACHT3);
-                          $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1, bereit = 0");    
+                          $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1, bereit = 0");
                           phaseInitialisieren(PHASENACHT3,$mysqli);
                           $pageReload = true;
                         }
@@ -528,9 +528,9 @@ p#liste {
                       {
                         //Hier erwachen die Werwölfe, die Seherin und können ihre Nachtaktivität ausführen
                         //Die anderen Spieler müssen auf einen Button drücken, um als ready zu gelten.
-                        
+
                         characterButton($mysqli); //Zuerst jedem Spieler seinen Charakter zeigen
-                        
+
                         //Schaue nach, welcher Charakter ich bin...
                         $spielerResult = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID");
                         $spielerAssoc = $spielerResult->fetch_assoc();
@@ -692,13 +692,13 @@ p#liste {
                                   $countdownAb = time();
                                 $mysqli->Query("UPDATE $spielID"."_spieler SET countdownBis = $countdownBis, countdownAb = $countdownAb WHERE (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ".CHARURWOLF.") AND lebt = 1");
                                 $mysqli->Query("UPDATE $spielID"."_game SET werwolfeinstimmig = 0");
-                                
+
                                 //Timer initialiseren
-                                $timerZahl = $countdownBis - time()+1; 
+                                $timerZahl = $countdownBis - time()+1;
                                 $timerAb = $countdownAb - time()+1;
                                 $aktBeiTime = true;
                                 $timerText = "Zeit, bis die Abstimmung der Werwölfe zu keinem Ergebnis führen kann: ";
-                                
+
                                 //Überprüfe, ob es nicht jetzt schon eine Einstimmigkeit gibt...
                                 //Die Wahl muss nicht einstimmig sein ...
                                 $werwolfQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE (nachtIdentitaet = ". CHARWERWOLF ." OR nachtIdentitaet = ".CHARURWOLF.") AND lebt = 1");
@@ -732,7 +732,7 @@ p#liste {
                             else
                             {
                               //Timer initialiseren
-                              $timerZahl = $eigeneAssoc['countdownBis'] - time()+1; 
+                              $timerZahl = $eigeneAssoc['countdownBis'] - time()+1;
                               $timerAb = $eigeneAssoc['countdownAb'] - time()+1;
                               $aktBeiTime = true;
                               $gameAssoc = gameAssoc($mysqli);
@@ -746,7 +746,7 @@ p#liste {
                               //einmal die Wahl eintragen
                               $wahlID = (int)$_POST['werwolfID'];
                               $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = $wahlID WHERE id = $eigeneID");
-                              
+
                               //Schauen, ob wir einstimmig sein müssen
                               $gameAssoc = gameAssoc($mysqli);
                               if ($gameAssoc['werwolfeinstimmig']==1)
@@ -769,7 +769,7 @@ p#liste {
                                   $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1, reload = 1 WHERE (nachtIdentitaet = ".CHARWERWOLF. " OR nachtIdentitaet = ". CHARURWOLF.")");
                                   $mysqli->Query("UPDATE $spielID"."_game SET werwolfopfer = $opfer");
                                   phaseBeendenWennAlleBereit(PHASENACHT3,$mysqli); //Schauen, ob wir die Phase schon beenden können
-                                  toGameLog($mysqli,"Die Wahl der Werwölfe fiel einstimmig auf: ". getName($mysqli,$opfer)); 
+                                  toGameLog($mysqli,"Die Wahl der Werwölfe fiel einstimmig auf: ". getName($mysqli,$opfer));
                                 }
                               }
                               else
@@ -836,7 +836,7 @@ p#liste {
                       elseif ($phase == PHASENACHT4)
                       {
                         characterButton($mysqli); //Zuerst jedem Spieler seinen Charakter zeigen
-                      
+
                         //Schaue nach, welcher Charakter ich bin...
                         $spielerResult = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID");
                         $spielerAssoc = $spielerResult->fetch_assoc();
@@ -900,7 +900,7 @@ p#liste {
                                 else
                                 {
                                   $mysqli->Query("UPDATE $spielID"."_spieler SET hexenOpfer = -1 WHERE id = $eigeneID");
-                                } 
+                                }
                               }
                               //Jetzt müssen wir die Hexe noch auf bereit setzen
                               setBereit($mysqli,$eigeneID,1);
@@ -951,9 +951,9 @@ p#liste {
                                 {
                                   //zeige den Button an
                                   dorfbewohnerWeiterschlafen();
-                                }  
+                                }
                               }
-                            }  
+                            }
                           }
                           else
                           {
@@ -972,7 +972,7 @@ p#liste {
                               dorfbewohnerWeiterschlafen();
                             }
                           }
-                        } 
+                        }
                       }
                       elseif ($phase == PHASENACHTENDE)
                       {
@@ -990,7 +990,7 @@ p#liste {
                         else
                         {
                           $mysqli->Query("UPDATE $spielID"."_game SET spielphase = ".PHASETOTEBEKANNTGEBEN);
-                          $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1, bereit = 0");    
+                          $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1, bereit = 0");
                           phaseInitialisieren(PHASETOTEBEKANNTGEBEN,$mysqli);
                           $pageReload = true;
                         }
@@ -1041,7 +1041,7 @@ p#liste {
                               {
                                 warteAufAndere($mysqli);
                               }
-                            }  
+                            }
                           }
                           else
                           {
@@ -1077,8 +1077,8 @@ p#liste {
                               {
                                 warteAufAndere($mysqli);
                               }
-                            } 
-                          
+                            }
+
                         }
                       }
                       elseif ($phase == PHASEBUERGERMEISTERWAHL)
@@ -1094,7 +1094,7 @@ p#liste {
                           $wahlID = (int)$_POST['buergermeisterID'];
                           $mysqli->Query("UPDATE $spielID"."_spieler SET wahlAuf = $wahlID WHERE id = $eigeneID");
                           //Dann schauen, ob wir schon eine Mehrheit haben
-                          
+
                           //Generiere eine Text zum Anzeigen, wer für wen gestimmt hat
                           $alleSpielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
                           $text = "";
@@ -1107,7 +1107,7 @@ p#liste {
                             $wahlAufSpieler[$w]++;
                             if ($w > -1)
                             {
-                                $text .= $temp['name']." -> ". getName($mysqli,$w). ", "; 
+                                $text .= $temp['name']." -> ". getName($mysqli,$w). ", ";
                             }
                           }
                           //Schauen, ob jemand mehr als 50% der Stimmen hat
@@ -1120,7 +1120,7 @@ p#liste {
                               $mysqli->Query("UPDATE $spielID"."_spieler SET buergermeister = 1 WHERE id = $id");
                               toGameLog($mysqli,getName($mysqli,$id)." wurde zum Bürgermeister gewählt, abgestimmt haben: $text");
                               toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde zum Bürgermeister gewählt, abgestimmt haben: $text");
-                              phaseBeendenWennAlleBereit(PHASEBUERGERMEISTERWAHL,$mysqli); 
+                              phaseBeendenWennAlleBereit(PHASEBUERGERMEISTERWAHL,$mysqli);
                               break;
                             }
                           }
@@ -1211,7 +1211,7 @@ p#liste {
                             echo "</form>";
                           }
                         }
-                        
+
                         //Als Bürgermeister habe ich zusätzlich noch die Möglichkeit, zur nächsten Phase zu springen
                         $bres = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE buergermeister = 1");
                         $bras = $bres->fetch_assoc();
@@ -1243,7 +1243,7 @@ p#liste {
                         echo "<form name='list'><div id='listdiv'></div></form>"; //Die Liste, was die anderen gewählt haben
                         $listReload=true;
                         $pageReload=true;
-                        
+
                         //Schaue zuerst, ob der timer noch nicht abgelaufen ist
                         $eigeneAssoc = eigeneAssoc($mysqli);
                         if ($eigeneAssoc['countdownBis']<= time())
@@ -1279,7 +1279,7 @@ p#liste {
                                 $wahlAufSpieler[$w]+=0.5;
                               if ($w > -1)
                               {
-                                  $text .= $temp['name']." -> ". getName($mysqli,$w). ", "; 
+                                  $text .= $temp['name']." -> ". getName($mysqli,$w). ", ";
                               }
                             }
                             $wahlErfolgreich = 0;
@@ -1292,7 +1292,7 @@ p#liste {
                                 toGameLog($mysqli,getName($mysqli,$id)." wurde bei der Abstimmung zum Tode verurteilt, mit den Stimmen: $text");
                                 toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde vom Dorf zum Tode verurteilt, mit den Stimmen: $text");
                                 endeDerAbstimmungEinfacheMehrheit($id,$mysqli);
-                                $wahlErfolgreich = 1; 
+                                $wahlErfolgreich = 1;
                                 break;
                               }
                             }
@@ -1340,7 +1340,7 @@ p#liste {
                                   }
                                 }
                                 if (!$exequo)
-                                { 
+                                {
                                   //Starte eine Stichwahl
                                   endeDerAbstimmungStichwahl($maxStimmenSpieler,$zweitMaxStimmenSpieler,$mysqli);
                                 }
@@ -1371,7 +1371,7 @@ p#liste {
                       }
                       elseif ($phase == PHASESTICHWAHL)
                       {
-                        characterButton($mysqli); 
+                        characterButton($mysqli);
                         //Es kommt zu einer Stichwahl
                         echo "<p >Stichwahl</p>";
                         echo "<div  id='timerdiv'></div><br>";
@@ -1413,9 +1413,9 @@ p#liste {
                                 $wahlAufSpieler[$w]+=0.5;
                               if ($w > -1)
                               {
-                                  $text .= $temp['name']." -> ". getName($mysqli,$w). ", "; 
+                                  $text .= $temp['name']." -> ". getName($mysqli,$w). ", ";
                               }
-                              
+
                             }
                             //Schauen, ob jemand mehr als 50% der Stimmen hat
                             foreach ($wahlAufSpieler as $id => $stimmen)
@@ -1426,7 +1426,7 @@ p#liste {
                                 $mysqli->Query("UPDATE $spielID"."_spieler SET bereit = 1");
                                 toGameLog($mysqli,getName($mysqli,$id)." wurde bei der Abstimmung zum Tode verurteilt, mit den Stimmen: $text");
                                 toAllPlayerLog($mysqli,getName($mysqli,$id)." wurde vom Dorf zum Tode verurteilt, mit den Stimmen: $text");
-                                endeDerStichwahl($id,$mysqli); 
+                                endeDerStichwahl($id,$mysqli);
                                 break;
                               }
                             }
@@ -1515,7 +1515,7 @@ p#liste {
                 //nachschauen, ob ein Spiel mit dieser Nummer bereits existiert
                 $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
                 if(isset($res->num_rows)){
-                    
+
                     //Tabelle existiert
                     }else{
                     //Tabelle existiert noch nicht
@@ -1604,10 +1604,10 @@ p#liste {
                       ) ;";
                     $mysqli->Query($sql2);
                     $mysqli->Query("INSERT INTO $spielID"."_game (spielphase, letzterAufruf) VALUES (0 , ".time().")");
-                    
+
                     //Die SpielID groß mitteilen
                     echo "<BR><h1 align = 'center'>$spielID</h1><BR>Mit dieser Zahl können andere deinem Spiel beitreten!";
-                    
+
                     //Die eigene SpielID setzen
                     setcookie ("SpielID", $spielID, time()+172800); //Dauer 2 Tage, länger sollte ein Spiel nicht dauern ;)
                     setcookie ("eigeneID",0, time()+172800);
@@ -1677,7 +1677,7 @@ p#liste {
                           $_COOKIE["SpielID"]=$spielID;
                           $_COOKIE["eigeneID"] = $i;
                           $_COOKIE["verifizierungsnr"] = $verifizierungsnr;
-                          $eigeneID = $i;                        
+                          $eigeneID = $i;
                           break; //die Schleife beenden
                         }
                       }
@@ -1711,7 +1711,7 @@ p#liste {
                 echo "<p class='error' >Sie müssen einen gültigen Namen eingeben</p>";
                 start();
               }
-            } 
+            }
           }
           else
           {
@@ -1740,12 +1740,12 @@ p#liste {
                   echo "<p class='normal' >".$a['name'];
                   echo"<input type='submit' value='entfernen' onClick='if (confirm(\"Wirklich diesen Spieler entfernen? Sie sollten das nur tun, wenn er inaktiv ist!\")==false){return false;}'></p>";
                   echo "</form>";
-              }                                                                       
-              echo "<hr></div>";   
+              }
+              echo "<hr></div>";
           }
         }
       }
-      
+
 ?>
 </section>
 <section id="client-settings">
@@ -1789,8 +1789,8 @@ var sekBisTimerBeginn;
       }
 
 
-   
-   function reloadmaintain(game, id){				
+
+   function reloadmaintain(game, id){
     xmlhttp.onreadystatechange=function()
     {
       if (xmlhttp.readyState==4)
@@ -1799,8 +1799,8 @@ var sekBisTimerBeginn;
         {
          if (xmlhttp.responseText == "1")
          {
-            setTimeout(self.location.href="Werwolf.php",1); 
-         }                                                                                                                  
+            setTimeout(self.location.href="Werwolf.php",1);
+         }
          else
          {
             setTimeout(reloadmaintain,3500,game,id);
@@ -1816,7 +1816,7 @@ var sekBisTimerBeginn;
     xmlhttp.open("GET","reload.php?game="+ game +"&id="+ id,true);
     xmlhttp.send();
 	}
-  
+
   function listRefresh(game, id, reload=0)
   {
     xmlhttp2.open("GET","listreload.php?game="+ game +"&id="+ id +"&reload="+reload,true);
@@ -1835,15 +1835,15 @@ var sekBisTimerBeginn;
               if (reload == 1 && arr[0] == 1)
               {
                   setTimeout(self.location.href="Werwolf.php",1);
-                  return;    
+                  return;
               }
               var count = (arr.length-1)/2;
               var para = document.getElementById("listdiv");
               while (para.firstChild) {
                   para.removeChild(para.firstChild);
               }
-              
-              
+
+
               for (var i = 0; i < count; i++)
               {
                 var temp = document.createElement("p");
@@ -1873,12 +1873,12 @@ var sekBisTimerBeginn;
           {
             //Error
             setTimeout(listRefresh,2*3000,game,id, reload);
-          } 
+          }
         }
       }
     xmlhttp2.send(null);
   }
-  
+
   function gameLogRefresh(game)
   {
     xmlhttp3.onreadystatechange=function()
@@ -1916,13 +1916,13 @@ var sekBisTimerBeginn;
     xmlhttp3.open("GET","gamelogreload.php?game="+ game,true);
     xmlhttp3.send();
   }
-  
+
   function timerAkt(akt,text)
   {
     if (sekBisTime < 0)
       return;
     if (sekBisTimerBeginn <= 0)
-    { 
+    {
       var timerDiv = document.getElementById("timerdiv");
       while (timerDiv.firstChild) {
               timerDiv.removeChild(timerDiv.firstChild);
@@ -1941,17 +1941,17 @@ var sekBisTimerBeginn;
     timerAkt(akt,timerText);
     setInterval(function(){timerAkt(akt,timerText);},1000);
   }
-  
+
   function setUpReload(game, id)
   {
     setTimeout(reloadmaintain,3500,game,id);
   }
-  
+
   function setUpListReload(game, id)
   {
     setTimeout(listRefresh,3000,game,id);
   }
-  
+
   function showGameLog(game)
   {
     var form = document.getElementById("gameLogForm");
@@ -1979,10 +1979,10 @@ var sekBisTimerBeginn;
       form.style.display = "block";
     }
   }
-  
+
   function jsstart()
   {
-    <?php if ($pageReload && !$listReload) 
+    <?php if ($pageReload && !$listReload)
     {
       echo 'reloadmaintain('.(int)$_COOKIE['SpielID'].','.(int)$_COOKIE['eigeneID'].');';
     }
@@ -1992,9 +1992,9 @@ var sekBisTimerBeginn;
     }
     elseif ($listReload && $pageReload)
     {
-        echo 'listRefresh('.(int)$_COOKIE['SpielID'].','.(int)$_COOKIE['eigeneID'].',1);';    
+        echo 'listRefresh('.(int)$_COOKIE['SpielID'].','.(int)$_COOKIE['eigeneID'].',1);';
     }
-    
+
     if ($timerZahl > 0)
     {
       echo 'timerInit('.$timerZahl.','.$aktBeiTime.','.$timerAb.',"'.$timerText.'");';
@@ -2012,7 +2012,7 @@ var sekBisTimerBeginn;
     }
     ?>
   }
-  
+
   function showHideCharacter()
   {
     var form = document.getElementById("CharacterInfo");
@@ -2025,7 +2025,7 @@ var sekBisTimerBeginn;
       form.style.display = "block";
     }
   }
-  
+
   function show_settings()
   {
     var form = document.getElementById("player_settings");
@@ -2038,7 +2038,7 @@ var sekBisTimerBeginn;
       form.style.display = "block";
     }
   }
-  
+
   function showHidePlayerLog()
   {
     var form = document.getElementById("PlayerLog");
@@ -2059,7 +2059,7 @@ var sekBisTimerBeginn;
     var n_r = <?php echo $c_back_n_r; ?>;
     var n_g = <?php echo $c_back_n_g; ?>;
     var n_b = <?php echo $c_back_n_b; ?>;
-    
+
     var rp = 1;
     var gp = 1;
     var bp = 1;
@@ -2071,7 +2071,7 @@ var sekBisTimerBeginn;
         bp = -1;
     if (tag == true)
     {
-      <?php //Von 404050 nach bbaa80 
+      <?php //Von 404050 nach bbaa80
       ?>
       var r = n_r+anzahl*rp;
       if ((r > d_r && rp == 1) || (r < d_r && rp == -1))
@@ -2093,7 +2093,7 @@ var sekBisTimerBeginn;
       { BB = "0"+BB;}
       if (r == d_r && b == d_b && g == d_g)
       {
-        
+
       }
       else
       {
@@ -2113,7 +2113,7 @@ var sekBisTimerBeginn;
       var b = d_b-anzahl*bp;
       if ((b < n_b && bp == 1) || (b > n_b && bp == -1))
         b=n_b;
-      
+
       var RR = r.toString(16);
       if (RR.length < 2)
       { RR = "0"+RR;}
@@ -2125,7 +2125,7 @@ var sekBisTimerBeginn;
       { BB = "0"+BB;}
       if (r == d_r && b == d_b && g == d_g)
       {
-       
+
       }
       else
       {
@@ -2143,157 +2143,19 @@ var sekBisTimerBeginn;
     var RR = d_r.toString(16);
       var GG = d_g.toString(16);
       var BB = d_b.toString(16);
-      
+
       if (RR.length < 2)
       { RR = "0"+RR;}
-      
+
       if (GG.length < 2)
       { GG = "0"+GG;}
-      
+
       if (BB.length < 2)
       { BB = "0"+BB;}
       var color = "#"+ RR + GG + BB;
-     document.getElementById("gameboard").style.backgroundColor = color; 
+     document.getElementById("gameboard").style.backgroundColor = color;
   }
-  
+
 </script>
 </body>
 </HTML>
-
-/*
-Erklärungen:
-Zu den Datenbank-Einträgen:
-[ID]_Game
-Spielphase  //ALT, jetzt über Konstanten gelöst
-0: Setup -> Spieler suchen  (PHASESETUP)
-1: Spielsetup -> jeder muss bestätigen, dass er dabei ist (PHASESPIELSETUP)
-2: Nacht Teil 1: Amor (PHASENACHT1)
-3: Nacht Teil 2: Verliebte (PHASENACHT2)
-4: Nacht Teil 3: Alle bis Werwölfe  (PHASENACHT3)
-5: Nacht Teil 4: Hexe (PHASENACHT4)
-6: Nacht Teil 5: Weitergabe des Amuletts (PHASENACHT5)
-7: Tag, Tote werden bekanntgegeben (PHASETOTEBEKANNTGEBEN)
-8: Tag, Bürgermeisterwahl (PHASEBUERGERMEISTERWAHL)
-9: Tag, Diskussion (PHASEDISKUSSION)
-10: Tag, Anklagen (PHASEANKLAGEN)
-11: Tag, Abstimmung (PHASEABSTIMMUNG)
-12: Tag, Stichwahl der Abstimmung (PHASESTICHWAHL)
-13: Tag, nach Abstimmung (PHASENACHABSTIMMUNG)
-14: Siegerehrung (PHASESIEGEREHRUNG)
-charaktereAufdecken
-0: Die Charaktere werden nicht aufgedeckt
-1: Die Charaktere werden aufgedeckt
-buergermeisterWeitergeben
-0: Beim Tod des Bürgermeisters wird ein neuer gewählt.
-1: Beim Tod des Bürgermeisters entscheidet der Bürgermeister, wer sein Nachfolger wird.
-werwolfzahl
-Gibt die Anzahl der Werwölfe beim Spielsetup an
-hexenzahl
-Gibt die Anzahl der Hexen beim Spielsetup an
-seherzahl
-Gibt die Anzahl der Seher beim Spielsetup an
-jaegerzahl
-Gibt die Anzahl der Jäger beim Spielsetup an
-amorzahl
-Gibt die Anzahl der Amor(s) an (max 1)
-letzterAufruf
-gibt den letzten Aufruf an, kann später einmal verwendet werden, um alte Spiele zu löschen.
-waiting_for_others_time
-Gibt an, ab wann angezeigt wird, auf wen wir noch warten
-werwolfopfer
-gibt das Opfer der Werwölfe an
-log
-Eine Log-Datei des gesamten Spiels
-Diese Datei soll das Spiel nachvollziehbar machen
-Nacht
-gibt die Anzahl der Nächte seit Spielbeginn an
-tagestext
-Gibt den Text an, der in Phase 7 allen angezeigt wird
-= Diese Nacht wurden getötet:
-SpielerX
-SpielerZ
-[ID]_Spieler
-Nachtidentitaet
-0: keine (CHARKEIN)
-1: Dorfbewohner (CHARDORFBEWOHNER)
-2: Werwolf (CHARWERWOLF)
-3: Seher (CHARSEHER)
-4: Hexe (CHARHEXE)
-5: Jäger (CHARJAEGER)
-6: Amor  (CHARAMOR)
-7: Leibwächter/Beschützer (CHARBESCHUETZER)
-8: Paranormaler Ermittler  (CHARPARERM)
-9: Lykantroph  (CHARLYKANTROPH)
-10: Spion (CHARSPION)
-11: Mordlustige(r), intern Idiot (CHARMORDLUSTIGER)
-12: Pazifist (CHARPAZIFIST)
-13: Alter Mann  (CHARALTERMANN)
-hexenOpfer
-Wen die Hexe töten will
-hexeHeilt
-0: Hexe heilt das Opfer der Werwölfe nicht
-1: Hexe heilt das Opfer der Werwölfe
-verliebtMit
-mit wem dieser Spieler vom Amor verliebt wurde
-jaegerDarfSchiessen
-0: Nichts Besonderes
-1: Der Jäger wurde getötet und darf jemanden mit in den Tod reißen
-buergermeisterDarfWeitergeben
-0: Nichts Besonderes
-1: Der Bürgermeister wurde getötet und gibt sein Amt weiter...
-playerlog
-Hier werden Sachen hineingeschrieben, die sich der Spieler wieder anschaun können soll
-z.B. als Seher wen er gesehen hat
-SESSION-Variablen Übersicht
-$_SESSION['SpielID'] gibt die ID des Spiels an
-$_SESSION['eigeneID'] gibt die eigene ID an
-ToDO:
-#1: DONE: Spieler mit gleichem Namen dürfen sich nicht in einem Spiel befinden  DONE
-#2: DONE: Verschiedene Texte der Dorfbewohner (einschlafen) DONE
-#3: DONE: Seher sollte gleich reloaden ...  DONE
-#4: DONE: Bei Anklagen nicht standardmäßig ein Spieler ausgewählt sein... DONE
-#5: DONE: Bei der Abstimmung sollte ersichtlich sein, wieviele Stimmen jeder (Angeklagte) erhalten hat EVTL. DONE
-#6: DONE: Wenn Bürgermeister in der Nacht stirbt, kommt es nicht zu einer neuen Abstimmung EVTL. DONE
-#7: DONE: In showGameLog fehlen die Zeilenumbrüche ... DONE
-#8: DONE: gameLog sollte auch wieder verborgen werden können ... DONE
-#9: DONE: In gameLog werden keine Umlaute angezeigt  ... DONE [Encoding auf ISO-8859-1 umgestellt]
-#10: DONE: Der eigene Name sollte angezeigt werden ... DONE
-#11: DONE: Es sollte dem Bürgermeister angezeigt werden, dass er Bürgermeister ist ... DONE
-#12: DONE: Beim Starten eines neuen Spieles sollten alte Spiele gelöscht werden ...
-#13: Javascript, das beim Spielerstellen anzeigt, wieviele Charaktere ausgewählt wurden ...
-#14: Die Spieler, die nicht Spielleiter sind, sollten sehen können, welche Regeln ausgewählt wurden ...
-#15: DONE: Bei der Stimmenanzahl soll erkennbar sein, dass der Bürgermeister 2 Stimmen hat [EDIT: bzw. 1,5]
-#16: DONE: Paranormalen Ermittler hinzufügen
-#17: DONE: Alten Mann hinzufügen
-#18: Trunkenbold hinzufügen
-#19: Amulett des Schutzes hinzufügen
-#20: Wolfsjunges hinzufügen
-#21: Einsamen Wolf hinzufügen
-#22: DONE: Lykantrophen hinzufügen
-#23: DONE: Bürgermeister nur 1/2 Stimme geben, Fixen, dass Abstimmungen nicht zu früh abgebrochen werden.
-#24: Abstimmungsergebnis anzeigen
-#25: DONE: Bug beim Entfernen von Spielern
-#26: Spieler sollten unter dem Spiel das Spiel verlassen können
-#27: DONE: Den Verstorbenen eine Liste aller Spieler anzeigen
-#28: Kultführer hinzufügen
-#29: Strolch hinzufügen
-#30: DONE: SQL injection unterbinden
-#31: Hintergrundgrafik (verschieden Tag/Nacht)
-#31: DONE: Als Option machen, dass niemand erfährt, wie die Charaktere verteilt sind
-#32: Wenn jemand während des Spiels aussteigt, sollte das Spiel damit zurechtkommen
-#33: DONE: Wenn einer der Verliebten stirbt, sollten beide am Tag auf der Totenliste erscheinen
-#34: DONE: Beim Spielbeitritt sollte jeder Spieler ein vom Server zugeteiltes persönliches Passwort bekommen (Cookie), dass sich niemand anders für ihn ausgeben kann.
-#35: DONE: Idiot und Pazifist hinzufügen [EDIT: Umbenennung von Idiot in Mordlustiger]
-#36: DONE: "Seher" hinzufügen, der eine Identität überprüfen kann --> der "Spion"
-#37: DONE: Umbenennen von Leibwächter in Beschützer
-#38: DONE: Umbenennen von Idiot in Mordlustige(r)
-#39: DONE: Timer einfügen, ab wann die Abstimmung am Tag zu keinem Ergebnis führt
-#40: DONE: Timer einfügen, ab wann die Werwölfe nicht mehr einstimmig abstimmen müssen, zweiten Timer, ab wann kein Opfer gewählt wird
-#41: Funktion für alle Buttons erstellen, dass die Buttons in Zukunft leicht mit Grafik ausgetauscht werdne können
-#42: DONE: Timereinstellungen in den Spieleinstellungen bearbeiten können
-#43: Zeige im Log an, wer wen anklagt
-#44: DONE: Charaktere und Phasen durch Konstanten ersetzt, die in constants.php definiert werden
-#45: DONE: Verbiete, dass sich jemand wie ein Charakter nennt (WERWOLF, HEXE, AMOR)
-#46: Bots hinzufügen, die von einem "BotController"="Spieler, der für refreshen zuständig ist" zB ein Laptop
-#47: DONE: Umstellen der Farben ermöglichen (v1.0.1, 30.12.2019)
-*/

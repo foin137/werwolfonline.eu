@@ -1,16 +1,16 @@
 <?php
-  
-  include "includes.php";
-  include "constants.php";
+
+  include "includes/includes.php";
+  include "includes/constants.php";
   header("Content-Type: text/html; charset=utf-8");
   header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
   header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
   header('Pragma: no-cache');
   $spielID = (int)$_GET['game'];
   $id = (int)$_GET['id'];
-  
+
   $trennzeichen = "$"; //Das Zeichen, auf das im Skript responded wird
-  
+
   //Reloaded eine Liste, erfordert komplexeren Code als reload.php
   //Die Liste, die reloaded wird ist unterschiedlich, je nach Spielphase und eigenem Charakter
   //Wenn reload gesetzt ist, wird außerdem geschaut, ob ich reloaden muss!
@@ -31,12 +31,12 @@
   }
   if ($ichLebeQ['lebt'] == 1)
     $ichLebe = true;
-  
-  
+
+
   $spielRes = $mysqli->Query("SELECT * FROM $spielID"."_game");
   $spielAss = $spielRes->fetch_assoc();
   $phase = $spielAss['spielphase'];
-  
+
   $text = "";
   if ($ichLebe || $phase <= PHASESPIELSETUP || $phase >= PHASESIEGEREHRUNG)
   {
@@ -47,7 +47,7 @@
         {
             //Sende vorgefertigte Antwort!
             echo $spielAss['list_lebe'];
-            die;   
+            die;
         }
       }
     if ($phase == PHASESETUP)
@@ -92,13 +92,13 @@
       //Schaue nach, ob ich Werwolf bin
       $myRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $id");
       $myAssoc = $myRes->fetch_assoc();
-      if ($myAssoc['nachtIdentitaet'] == CHARWERWOLF || $myAssoc['nachtIdentitaet'] == CHARURWOLF) 
+      if ($myAssoc['nachtIdentitaet'] == CHARWERWOLF || $myAssoc['nachtIdentitaet'] == CHARURWOLF)
       {
         //Ich bin Werwolf --> Liste der (lebenden) Werwölfe
         $spielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
         while ($temp = $spielerRes->fetch_assoc())
         {
-        
+
           if (($temp['nachtIdentitaet']==CHARWERWOLF || $temp['nachtIdentitaet']==CHARURWOLF) && $temp['lebt']==1)
           {
             if ($temp['wahlAuf']==-1)
@@ -111,7 +111,7 @@
               echo $trennzeichen.$temp['name']." (wach): ".$nameAssoc['name'].$trennzeichen."1";
             }
           }
-          
+
         }
       }
       die;
@@ -165,7 +165,7 @@
           $buergermeisterText = " + Stimme des Bürgermeisters";
         $text.= $trennzeichen.$temp['name'].", normale Stimmen: ".$stimmenRes->num_rows.$buergermeisterText.$trennzeichen."2";
       }
-      
+
       //Dann zeige an, wer für wen gestimmt hat
       $spielerRes2 = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
       while ($temp = $spielerRes2->fetch_assoc())
@@ -197,7 +197,7 @@
           $buergermeisterText = " + Stimme des Bürgermeisters";
         $text.= $trennzeichen.$temp['name'].", normale Stimmen: ".$stimmenRes->num_rows.$buergermeisterText.$trennzeichen."2";
       }
-      
+
       //Dann zeige an, wer für wen gestimmt hat
       $spielerRes2 = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
       while ($temp = $spielerRes2->fetch_assoc())
@@ -224,7 +224,7 @@
       {
           //Sende vorgefertigte Antwort!
           echo $spielAss['list_tot'];
-          die;   
+          die;
       }
     }
     $rueckgabe = "";
@@ -255,13 +255,13 @@
         break;
       case PHASEABSTIMMUNG:
         $text = "Abstimmung";
-        break;      
+        break;
       case PHASESTICHWAHL:
         $text = "Stichwahl";
         break;
     }
     $rueckgabe.= $trennzeichen.$text.$trennzeichen."3";
-    
+
     $spielerRes = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
       while ($temp = $spielerRes->fetch_assoc())
       {
@@ -308,8 +308,8 @@
           $identitaet = "Alte(r)";
           break;
         case CHARURWOLF:
-          $identitaet = "Urwolf/Urwölfin"; 
-          break; 
+          $identitaet = "Urwolf/Urwölfin";
+          break;
       }
   //Eine Liste aller aktiver Spieler anzeigen
   //zuerst alle Lebenden anzeigen
@@ -354,7 +354,7 @@
         {
           $rueckgabe.= $trennzeichen.$temp['name']." ($identitaet)".$trennzeichen."0";
         }
-        
+
       }
     }
     //Dann alle Toten anzeigen
@@ -404,22 +404,22 @@
           $identitaet = "Alte(r)";
           break;
         case CHARURWOLF:
-          $identitaet = "Urwolf/Urwölfin"; 
-          break; 
+          $identitaet = "Urwolf/Urwölfin";
+          break;
       }
   //Eine Liste aller aktiver Spieler anzeigen
   //zuerst alle Lebenden anzeigen
-      
+
       $rueckgabe.= $trennzeichen.$temp['name']." ($identitaet, tot)".$trennzeichen."4";
-          
+
     }
     $mysqli->Query("UPDATE $spielID"."_game SET `list_tot` = '$rueckgabe', `list_tot_aktualisiert` = ". (int)(microtime(true)*1000));
     echo $rueckgabe;
   }
-   
+
   //0: schwarz
   //1: grün
   //2: rot
   //3: schwarz groß
-  //4: grau 
+  //4: grau
 ?>
