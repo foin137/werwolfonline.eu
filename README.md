@@ -16,7 +16,7 @@ You can find the corresponding setting "output_buffering" in the php.ini file. S
 
 You also need a database called "werwolf", you do not need to insert any tables, this is done by the script automatically.
 
-Rename 'includes.example.php' to 'includes.php' and insert your id, passwort and host.
+Rename 'includes.example.php' in the 'includes'-folder to 'includes.php' and insert your id, passwort and host.
 
 If you want to use a different database name, you can change it in 'includes.php'.
 
@@ -36,6 +36,6 @@ Die Einstellung findet man in der php.ini Datei unter "output_buffering". Ein We
 
 Die Datenbank muss keine Tabellen enthalten, die werden vom php Skript selbst erstellt.
 
-Benenne 'includes.example.php' in 'includes.php' um und füge id, passwort und host für die Anmeldung in der Datenbank hinzu!
+Benenne 'includes.example.php' im 'includes'-Ordner in 'includes.php' um und füge id, passwort und host für die Anmeldung in der Datenbank hinzu!
 
 Es kann natürlich auch ein anderer Name für die Datenbank verwendet werden. Die zugehörige Einstellung kann in 'includes.php' vorgenommen werden.
