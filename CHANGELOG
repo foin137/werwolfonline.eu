@@ -1,0 +1,137 @@
+/*
+Erklärungen:
+Zu den Datenbank-Einträgen:
+[ID]_Game
+Spielphase  //ALT, jetzt über Konstanten gelöst
+0: Setup -> Spieler suchen  (PHASESETUP)
+1: Spielsetup -> jeder muss bestätigen, dass er dabei ist (PHASESPIELSETUP)
+2: Nacht Teil 1: Amor (PHASENACHT1)
+3: Nacht Teil 2: Verliebte (PHASENACHT2)
+4: Nacht Teil 3: Alle bis Werwölfe  (PHASENACHT3)
+5: Nacht Teil 4: Hexe (PHASENACHT4)
+6: Nacht Teil 5: Weitergabe des Amuletts (PHASENACHT5)
+7: Tag, Tote werden bekanntgegeben (PHASETOTEBEKANNTGEBEN)
+8: Tag, Bürgermeisterwahl (PHASEBUERGERMEISTERWAHL)
+9: Tag, Diskussion (PHASEDISKUSSION)
+10: Tag, Anklagen (PHASEANKLAGEN)
+11: Tag, Abstimmung (PHASEABSTIMMUNG)
+12: Tag, Stichwahl der Abstimmung (PHASESTICHWAHL)
+13: Tag, nach Abstimmung (PHASENACHABSTIMMUNG)
+14: Siegerehrung (PHASESIEGEREHRUNG)
+charaktereAufdecken
+0: Die Charaktere werden nicht aufgedeckt
+1: Die Charaktere werden aufgedeckt
+buergermeisterWeitergeben
+0: Beim Tod des Bürgermeisters wird ein neuer gewählt.
+1: Beim Tod des Bürgermeisters entscheidet der Bürgermeister, wer sein Nachfolger wird.
+werwolfzahl
+Gibt die Anzahl der Werwölfe beim Spielsetup an
+hexenzahl
+Gibt die Anzahl der Hexen beim Spielsetup an
+seherzahl
+Gibt die Anzahl der Seher beim Spielsetup an
+jaegerzahl
+Gibt die Anzahl der Jäger beim Spielsetup an
+amorzahl
+Gibt die Anzahl der Amor(s) an (max 1)
+letzterAufruf
+gibt den letzten Aufruf an, kann später einmal verwendet werden, um alte Spiele zu löschen.
+waiting_for_others_time
+Gibt an, ab wann angezeigt wird, auf wen wir noch warten
+werwolfopfer
+gibt das Opfer der Werwölfe an
+log
+Eine Log-Datei des gesamten Spiels
+Diese Datei soll das Spiel nachvollziehbar machen
+Nacht
+gibt die Anzahl der Nächte seit Spielbeginn an
+tagestext
+Gibt den Text an, der in Phase 7 allen angezeigt wird
+= Diese Nacht wurden getötet:
+SpielerX
+SpielerZ
+[ID]_Spieler
+Nachtidentitaet
+0: keine (CHARKEIN)
+1: Dorfbewohner (CHARDORFBEWOHNER)
+2: Werwolf (CHARWERWOLF)
+3: Seher (CHARSEHER)
+4: Hexe (CHARHEXE)
+5: Jäger (CHARJAEGER)
+6: Amor  (CHARAMOR)
+7: Leibwächter/Beschützer (CHARBESCHUETZER)
+8: Paranormaler Ermittler  (CHARPARERM)
+9: Lykantroph  (CHARLYKANTROPH)
+10: Spion (CHARSPION)
+11: Mordlustige(r), intern Idiot (CHARMORDLUSTIGER)
+12: Pazifist (CHARPAZIFIST)
+13: Alter Mann  (CHARALTERMANN)
+hexenOpfer
+Wen die Hexe töten will
+hexeHeilt
+0: Hexe heilt das Opfer der Werwölfe nicht
+1: Hexe heilt das Opfer der Werwölfe
+verliebtMit
+mit wem dieser Spieler vom Amor verliebt wurde
+jaegerDarfSchiessen
+0: Nichts Besonderes
+1: Der Jäger wurde getötet und darf jemanden mit in den Tod reißen
+buergermeisterDarfWeitergeben
+0: Nichts Besonderes
+1: Der Bürgermeister wurde getötet und gibt sein Amt weiter...
+playerlog
+Hier werden Sachen hineingeschrieben, die sich der Spieler wieder anschaun können soll
+z.B. als Seher wen er gesehen hat
+SESSION-Variablen Übersicht
+$_SESSION['SpielID'] gibt die ID des Spiels an
+$_SESSION['eigeneID'] gibt die eigene ID an
+ToDO:
+#1: DONE: Spieler mit gleichem Namen dürfen sich nicht in einem Spiel befinden  DONE
+#2: DONE: Verschiedene Texte der Dorfbewohner (einschlafen) DONE
+#3: DONE: Seher sollte gleich reloaden ...  DONE
+#4: DONE: Bei Anklagen nicht standardmäßig ein Spieler ausgewählt sein... DONE
+#5: DONE: Bei der Abstimmung sollte ersichtlich sein, wieviele Stimmen jeder (Angeklagte) erhalten hat EVTL. DONE
+#6: DONE: Wenn Bürgermeister in der Nacht stirbt, kommt es nicht zu einer neuen Abstimmung EVTL. DONE
+#7: DONE: In showGameLog fehlen die Zeilenumbrüche ... DONE
+#8: DONE: gameLog sollte auch wieder verborgen werden können ... DONE
+#9: DONE: In gameLog werden keine Umlaute angezeigt  ... DONE [Encoding auf ISO-8859-1 umgestellt]
+#10: DONE: Der eigene Name sollte angezeigt werden ... DONE
+#11: DONE: Es sollte dem Bürgermeister angezeigt werden, dass er Bürgermeister ist ... DONE
+#12: DONE: Beim Starten eines neuen Spieles sollten alte Spiele gelöscht werden ...
+#13: Javascript, das beim Spielerstellen anzeigt, wieviele Charaktere ausgewählt wurden ...
+#14: Die Spieler, die nicht Spielleiter sind, sollten sehen können, welche Regeln ausgewählt wurden ...
+#15: DONE: Bei der Stimmenanzahl soll erkennbar sein, dass der Bürgermeister 2 Stimmen hat [EDIT: bzw. 1,5]
+#16: DONE: Paranormalen Ermittler hinzufügen
+#17: DONE: Alten Mann hinzufügen
+#18: Trunkenbold hinzufügen
+#19: Amulett des Schutzes hinzufügen
+#20: Wolfsjunges hinzufügen
+#21: Einsamen Wolf hinzufügen
+#22: DONE: Lykantrophen hinzufügen
+#23: DONE: Bürgermeister nur 1/2 Stimme geben, Fixen, dass Abstimmungen nicht zu früh abgebrochen werden.
+#24: Abstimmungsergebnis anzeigen
+#25: DONE: Bug beim Entfernen von Spielern
+#26: Spieler sollten unter dem Spiel das Spiel verlassen können
+#27: DONE: Den Verstorbenen eine Liste aller Spieler anzeigen
+#28: Kultführer hinzufügen
+#29: Strolch hinzufügen
+#30: DONE: SQL injection unterbinden
+#31: Hintergrundgrafik (verschieden Tag/Nacht)
+#31: DONE: Als Option machen, dass niemand erfährt, wie die Charaktere verteilt sind
+#32: Wenn jemand während des Spiels aussteigt, sollte das Spiel damit zurechtkommen
+#33: DONE: Wenn einer der Verliebten stirbt, sollten beide am Tag auf der Totenliste erscheinen
+#34: DONE: Beim Spielbeitritt sollte jeder Spieler ein vom Server zugeteiltes persönliches Passwort bekommen (Cookie), dass sich niemand anders für ihn ausgeben kann.
+#35: DONE: Idiot und Pazifist hinzufügen [EDIT: Umbenennung von Idiot in Mordlustiger]
+#36: DONE: "Seher" hinzufügen, der eine Identität überprüfen kann --> der "Spion"
+#37: DONE: Umbenennen von Leibwächter in Beschützer
+#38: DONE: Umbenennen von Idiot in Mordlustige(r)
+#39: DONE: Timer einfügen, ab wann die Abstimmung am Tag zu keinem Ergebnis führt
+#40: DONE: Timer einfügen, ab wann die Werwölfe nicht mehr einstimmig abstimmen müssen, zweiten Timer, ab wann kein Opfer gewählt wird
+#41: Funktion für alle Buttons erstellen, dass die Buttons in Zukunft leicht mit Grafik ausgetauscht werdne können
+#42: DONE: Timereinstellungen in den Spieleinstellungen bearbeiten können
+#43: Zeige im Log an, wer wen anklagt
+#44: DONE: Charaktere und Phasen durch Konstanten ersetzt, die in constants.php definiert werden
+#45: DONE: Verbiete, dass sich jemand wie ein Charakter nennt (WERWOLF, HEXE, AMOR)
+#46: Bots hinzufügen, die von einem "BotController"="Spieler, der für refreshen zuständig ist" zB ein Laptop
+#47: DONE: Umstellen der Farben ermöglichen (v1.0.1, 30.12.2019)
+*/
