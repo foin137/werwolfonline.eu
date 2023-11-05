@@ -278,25 +278,25 @@ function spielRegeln($mysqli)
     auswahl.werwoelfe.disabled = false;auswahl.werwolfbutton1.disabled=false; auswahl.werwolfbutton2.disabled=false;}'><label for='zufaelligauswaehlenID'> Die Charaktere verdeckt und zufällig auswählen </label></span>
     <p class='normal' >Geben Sie dazu eine maximale Anzahl von Charakteren ein, die vorkommen sollen, bei Werwölfen müssen sie nichts eingeben<br>
     Zusätzlich können Sie noch einen Wert eingeben, der die Verteilung bestimmt. Ein positiver Wert erleichtert das Spiel für die Dorfbewohner, ein negativer für die Werwölfe (nur bei der zufälligen Charakterverteilung)</p>";
-  echo "<span class='normal' ><label for='zufaelligeAuswahlBonusID'> Verteilung der zufälligen Charaktere </label><INPUT TYPE='number'   NAME='zufaelligeAuswahlBonus' id='zufaelligeAuswahlBonusID' Size='2' value=$zufaelligeAuswahlBonus MIN=-15 MAX=15></span>";
+  echo "<span class='normal' ><label for='zufaelligeAuswahlBonusID'> Verteilung der zufälligen Charaktere </label><INPUT TYPE='number'   NAME='zufaelligeAuswahlBonus' id='zufaelligeAuswahlBonusID' Size='4' value=$zufaelligeAuswahlBonus MIN=-15 MAX=15></span>";
   echo "</div>";
   echo "<div><h3 >Countdown-Einstellungen</h3>";
   echo "<span class='normal' ><INPUT TYPE='button' VALUE='Countdowns zurücksetzen' OnClick='auswahl.werwolftimer1.value=60; auswahl.werwolfzusatz1.value=4; auswahl.werwolftimer2.value=50; auswahl.werwolfzusatz2.value=3; auswahl.dorftimer.value=550; auswahl.dorfzusatz.value=10; auswahl.dorfstichwahltimer.value=200; auswahl.dorfstichwahlzusatz.value=5'></span>";
   echo "<span class='normal' ><label for='werwolftimer1ID'>Sekunden, bis die Werwölfe nicht mehr einstimmig wählen müssen: </label>
-    <INPUT TYPE='number' NAME='werwolftimer1' id='werwolftimer1ID' SIZE='2' VALUE=$werwolftimer1 MIN='20' MAX='500'><br>
-    <label for='werwolfzusatz1ID'>Zusätzliche Zeit pro Werwolf: </label><INPUT TYPE='number' NAME='werwolfzusatz1' id='werwolfzusatz1ID' SIZE='2' VALUE=$werwolfzusatz1 MIN='0' MAX='60'></span>";
+    <INPUT TYPE='number' NAME='werwolftimer1' id='werwolftimer1ID' SIZE='4' VALUE=$werwolftimer1 MIN='20' MAX='500'><br>
+    <label for='werwolfzusatz1ID'>Zusätzliche Zeit pro Werwolf: </label><INPUT TYPE='number' NAME='werwolfzusatz1' id='werwolfzusatz1ID' SIZE='4' VALUE=$werwolfzusatz1 MIN='0' MAX='60'></span>";
   echo "<span class='normal' ><label for='werwolftimer2ID'>Sekunden, bis nach Ablaufen der Einstimmigkeit die Wahl der Werwölfe erfolglos ist: </label>
-    <INPUT TYPE='number' NAME='werwolftimer2' id='werwolftimer2ID' SIZE='2' VALUE=$werwolftimer2 MIN='10' MAX='500'><br>
-    <label for='werwolfzusatz2ID'>Zusätzliche Zeit pro Werwolf: </label><INPUT TYPE='number' NAME='werwolfzusatz2' id='werwolfzusatz2ID' SIZE='2' VALUE=$werwolfzusatz2 MIN='0' MAX='60'></span>";
+    <INPUT TYPE='number' NAME='werwolftimer2' id='werwolftimer2ID' SIZE='4' VALUE=$werwolftimer2 MIN='10' MAX='500'><br>
+    <label for='werwolfzusatz2ID'>Zusätzliche Zeit pro Werwolf: </label><INPUT TYPE='number' NAME='werwolfzusatz2' id='werwolfzusatz2ID' SIZE='4' VALUE=$werwolfzusatz2 MIN='0' MAX='60'></span>";
   echo "<span class='normal' ><label for='dorftimerID'>Sekunden, bis die normale Abstimmung des Dorfes am Tag erfolglos ist: </label>
-    <INPUT TYPE='number' NAME='dorftimer' id='dorftimerID' SIZE='2' VALUE=$dorftimer MIN='60' MAX='7200'><br>
-    <label for='dorfzusatzID'>Zusätzliche Zeit pro Dorfbewohner: </label><INPUT TYPE='number' NAME='dorfzusatz' id='dorfzusatzID' SIZE='2' VALUE=$dorfzusatz MIN='0' MAX='300'></span>";
+    <INPUT TYPE='number' NAME='dorftimer' id='dorftimerID' SIZE='4' VALUE=$dorftimer MIN='60' MAX='7200'><br>
+    <label for='dorfzusatzID'>Zusätzliche Zeit pro Dorfbewohner: </label><INPUT TYPE='number' NAME='dorfzusatz' id='dorfzusatzID' SIZE='4' VALUE=$dorfzusatz MIN='0' MAX='300'></span>";
   echo "<span class='normal' ><label for='dorfstichwahltimerID'>Sekunden, bis die Stichwahl am Tag erfolglos ist: </label>
-    <INPUT TYPE='number' NAME='dorfstichwahltimer' id='dorfstichwahltimerID' SIZE='2' VALUE=$dorfstichwahltimer MIN='30' MAX='3600'><br>
-    <label for='dorfstichwahlzusatzID'>Zusätzliche Zeit pro Dorfbewohner: </label><INPUT TYPE='number' NAME='dorfstichwahlzusatz' id='dorfstichwahlzusatzID' SIZE='2' VALUE=$dorfstichwahlzusatz MIN='0' MAX='300'></span>";
+    <INPUT TYPE='number' NAME='dorfstichwahltimer' id='dorfstichwahltimerID' SIZE='4' VALUE=$dorfstichwahltimer MIN='30' MAX='3600'><br>
+    <label for='dorfstichwahlzusatzID'>Zusätzliche Zeit pro Dorfbewohner: </label><INPUT TYPE='number' NAME='dorfstichwahlzusatz' id='dorfstichwahlzusatzID' SIZE='4' VALUE=$dorfstichwahlzusatz MIN='0' MAX='300'></span>";
   echo "<span class='normal' ><label for='inaktivzeitID'>Sekunden, nach denen angezeigt wird, auf wen noch gewartet wird: </label>
-    <INPUT TYPE='number' NAME='inaktivzeit' id='inaktivzeitID' SIZE='2' VALUE=$inaktivzeit MIN='20' MAX='3600'><br>
-    <label for='inaktivzeitzusatzID'>Zusätzliche Zeit pro Spieler: </label><INPUT TYPE='number' NAME='inaktivzeitzusatz' id='inaktivzeitzusatzID' SIZE='2' VALUE=$inaktivzeitzusatz MIN='0' MAX='300'></span>";
+    <INPUT TYPE='number' NAME='inaktivzeit' id='inaktivzeitID' SIZE='4' VALUE=$inaktivzeit MIN='20' MAX='3600'><br>
+    <label for='inaktivzeitzusatzID'>Zusätzliche Zeit pro Spieler: </label><INPUT TYPE='number' NAME='inaktivzeitzusatz' id='inaktivzeitzusatzID' SIZE='4' VALUE=$inaktivzeitzusatz MIN='0' MAX='300'></span>";
   echo "</div><span align = 'center'><input type='submit' value = 'Speichern'/></span>";
   echo "</form>";
 }
