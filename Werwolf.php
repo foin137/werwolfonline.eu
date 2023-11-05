@@ -1463,8 +1463,16 @@ p#liste {
                           if (isset($_POST['neuesSpiel']))
                           {
                             //Starten wir ein neues Spiel
-                            $mysqli->Query("UPDATE $spielID"."_game SET spielphase = ".PHASESETUP);
-                            $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1");
+                            if (_NOGAMECREATIONERRORMESSAGE == "")
+                            {
+                              $mysqli->Query("UPDATE $spielID"."_game SET spielphase = ".PHASESETUP);
+                              $mysqli->Query("UPDATE $spielID"."_spieler SET reload = 1");
+                            }
+                            else
+                            {
+                              //Spiel darf nicht erstellt werden, da _NOGAMECREATIONERRORMESSAGE existiert
+                              echo "<p class='error' >Spiel darf nicht erstellt werden: ". _NOGAMECREATIONERRORMESSAGE ."</p>";
+                            }
                           }
                           echo "<form action='Werwolf.php' method='post'>
                           <input type='hidden' name='neuesSpiel' value=1 />
@@ -1509,129 +1517,138 @@ p#liste {
                 if (rand(1,100)==50)
                   loescheAlteSpiele($mysqli);
                 //Wir erstellen ein neues Spiel
-                //Eine Schleife, die solange rennt, bis eine neue Zahl gefunden wurde
-                for ($i = 1; $i <= 100000; $i++)
+
+                if (_NOGAMECREATIONERRORMESSAGE == "") //Wir dürfen nur ein neues Spiel erstellen, falls diese message auf "" steht
                 {
-                if ($i == 1000)
+                  //Eine Schleife, die solange rennt, bis eine neue Zahl gefunden wurde
+                  for ($i = 1; $i <= 100000; $i++)
+                  {
+                  if ($i == 1000)
+                  {
+                    //Vielleicht gibt es alte Spiele, die Platz verbrauchen
+                    loescheAlteSpiele($mysqli);
+                  }
+                  $spielID = rand(10000,99999);
+                  //nachschauen, ob ein Spiel mit dieser Nummer bereits existiert
+                  $existiert = False;
+                  try {
+                    $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
+                  }
+                  catch (mysqli_sql_exception $e){
+                    $existiert = True;
+                  }
+                  if(!$existiert && isset($res->num_rows)){
+
+                      //Tabelle existiert
+                      }else{
+                      //Tabelle existiert noch nicht
+                      //erstellen wir eine neue Tabelle
+                      //BEIM HINZUFÜGEN: Auch die SetSpielerDefaultFunction ändern
+                      $sql = "
+                        CREATE TABLE `$spielID"."_spieler" ."` (
+                        `id` INT( 10 ) NULL,
+                        `name` VARCHAR( 150 ) NOT NULL ,
+                        `spielleiter` INT( 5 ) NULL ,
+                        `lebt` INT (2) NULL,
+                        `wahlAuf` INT ( 5 ) DEFAULT -1 ,
+                        `angeklagtVon` INT ( 5 ) DEFAULT -1 ,
+                        `nachtIdentitaet` INT( 10 ) NULL,
+                        `buergermeister` INT ( 2 ) DEFAULT 0,
+                        `hexeHeiltraenke` INT( 10 ) NULL,
+                        `hexeTodestraenke` INT( 5 ) NULL ,
+                        `hexenOpfer` INT ( 5 ) DEFAULT -1 ,
+                        `hexeHeilt` INT (2) DEFAULT 0,
+                        `beschuetzerLetzteRundeBeschuetzt` INT( 5 ) DEFAULT -1 ,
+                        `parErmEingesetzt` INT (2) DEFAULT 0 ,
+                        `verliebtMit` INT ( 5 ) DEFAULT -1 ,
+                        `jaegerDarfSchiessen` INT (2) DEFAULT 0 ,
+                        `buergermeisterDarfWeitergeben` INT (2) DEFAULT 0 ,
+                        `urwolf_anzahl_faehigkeiten` INT ( 5 ) DEFAULT 0,
+                        `dieseNachtGestorben` INT (2) DEFAULT 0 ,
+                        `countdownBis` INT (10) DEFAULT 0 ,
+                        `countdownAb` INT (10) DEFAULT 0 ,
+                        `playerlog` LONGTEXT ,
+                        `popup_text` TEXT ,
+                        `bereit` INT (2) NULL ,
+                        `reload` INT (2) NULL ,
+                        `verifizierungsnr` INT ( 5 ) DEFAULT 0
+                        )  ;
+                        ";
+                      $mysqli->Query($sql);
+                      //Wähle ein Verifizierungs-Passwort aus:
+                      //Dieses dient dazu, um festzustellen, ob es tatsächlich der richtige Spieler ist, der eine Seite lädt
+                      $verifizierungsnr = rand(2,100000);
+                      $stmt = $mysqli->prepare("INSERT INTO $spielID"."_spieler"." (id, name , spielleiter, lebt, reload, verifizierungsnr) VALUES ( 0 , ?, 1 , 0 , 1, ?)");
+                      $stmt->bind_param('si',$_POST['ihrName'],$verifizierungsnr);
+                      $stmt->execute();
+                      $stmt->close();
+                      $sql2 = "
+                        CREATE TABLE `$spielID"."_game` (
+                        `spielphase` INT( 5 ) DEFAULT 0,
+                        `charaktereAufdecken` INT ( 2 ) DEFAULT 0,
+                        `buergermeisterWeitergeben` INT ( 2 ) DEFAULT 0,
+                        `seherSiehtIdentitaet` INT ( 2 ) DEFAULT 1,
+                        `werwolfzahl` INT ( 5 ) DEFAULT 0 ,
+                        `hexenzahl` INT ( 5 ) DEFAULT 0 ,
+                        `seherzahl` INT ( 5 ) DEFAULT 0 ,
+                        `jaegerzahl` INT ( 5 ) DEFAULT 0 ,
+                        `amorzahl` INT ( 2 ) DEFAULT 0 ,
+                        `beschuetzerzahl` INT ( 5 ) DEFAULT 0 ,
+                        `parErmZahl` INT (5) DEFAULT 0 ,
+                        `lykantrophenzahl` INT ( 5 ) DEFAULT 0 ,
+                        `spionezahl` INT ( 5 ) DEFAULT 0 ,
+                        `idiotenzahl` INT ( 5 ) DEFAULT 0 ,
+                        `pazifistenzahl` INT ( 5 ) DEFAULT 0 ,
+                        `altenzahl` INT ( 5 ) DEFAULT 0 ,
+                        `urwolfzahl` INT ( 5 ) DEFAULT 0 ,
+                        `zufaelligeAuswahl` INT ( 2 ) DEFAULT 0 ,
+                        `zufaelligeAuswahlBonus` INT ( 5 ) DEFAULT 0 ,
+                        `werwolfeinstimmig` INT ( 2 ) DEFAULT 1 ,
+                        `werwolfopfer` INT ( 5 ) DEFAULT -1 ,
+                        `werwolftimer1` INT ( 10 ) DEFAULT 60 ,
+                        `werwolfzusatz1` INT ( 10 ) DEFAULT 4 ,
+                        `werwolftimer2` INT ( 10 ) DEFAULT 50 ,
+                        `werwolfzusatz2` INT ( 10 ) DEFAULT 3 ,
+                        `dorftimer` INT ( 10 ) DEFAULT 550 ,
+                        `dorfzusatz` INT ( 10 ) DEFAULT 10 ,
+                        `dorfstichwahltimer` INT ( 10 ) DEFAULT 200 ,
+                        `dorfstichwahlzusatz` INT ( 10 ) DEFAULT 5 ,
+                        `inaktivzeit` INT ( 10 ) DEFAULT 40 ,
+                        `inaktivzeitzusatz` INT ( 10 ) DEFAULT 0 ,
+                        `tagestext` TEXT ,
+                        `nacht` INT ( 5 ) DEFAULT 1 ,
+                        `log` LONGTEXT ,
+                        `list_lebe` LONGTEXT,
+                        `list_lebe_aktualisiert` BIGINT DEFAULT 0,
+                        `list_tot` LONGTEXT,
+                        `list_tot_aktualisiert` BIGINT DEFAULT 0,
+                        `waiting_for_others_time` BIGINT,
+                        `letzterAufruf` BIGINT
+                        ) ;";
+                      $mysqli->Query($sql2);
+                      $mysqli->Query("INSERT INTO $spielID"."_game (spielphase, letzterAufruf) VALUES (0 , ".time().")");
+
+                      //Die SpielID groß mitteilen
+                      echo "<BR><h1 align = 'center'>$spielID</h1><BR>Mit dieser Zahl können andere deinem Spiel beitreten!";
+
+                      //Die eigene SpielID setzen
+                      setcookie ("SpielID", $spielID, time()+172800); //Dauer 2 Tage, länger sollte ein Spiel nicht dauern ;)
+                      setcookie ("eigeneID",0, time()+172800);
+                      setcookie ("verifizierungsnr",$verifizierungsnr, time()+172800);
+                      $_COOKIE["SpielID"]=$spielID;
+                      $_COOKIE["eigeneID"] = 0;
+                      $_COOKIE["verifizieren"] = $verifizierungsnr;
+                      writeGameToLogSpielErstellen($mysqli,$spielID,$_POST['ihrName']);
+                      break; //die Schleife beenden
+                      }
+                  }
+                  $pageReload = true;
+                }
+                else
                 {
-                  //Vielleicht gibt es alte Spiele, die Platz verbrauchen
-                  loescheAlteSpiele($mysqli);
+                  //Spiel darf nicht erstellt werden, da _NOGAMECREATIONERRORMESSAGE existiert
+                  echo "<p class='error' >Spiel darf nicht erstellt werden: ". _NOGAMECREATIONERRORMESSAGE ."</p>";
                 }
-                $spielID = rand(10000,99999);
-                //nachschauen, ob ein Spiel mit dieser Nummer bereits existiert
-                $existiert = False;
-                try {
-                  $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
-                }
-                catch (mysqli_sql_exception $e){
-                  $existiert = True;
-                }
-                if(!$existiert && isset($res->num_rows)){
-
-                    //Tabelle existiert
-                    }else{
-                    //Tabelle existiert noch nicht
-                    //erstellen wir eine neue Tabelle
-                    //BEIM HINZUFÜGEN: Auch die SetSpielerDefaultFunction ändern
-                    $sql = "
-                      CREATE TABLE `$spielID"."_spieler" ."` (
-                      `id` INT( 10 ) NULL,
-                      `name` VARCHAR( 150 ) NOT NULL ,
-                      `spielleiter` INT( 5 ) NULL ,
-                      `lebt` INT (2) NULL,
-                      `wahlAuf` INT ( 5 ) DEFAULT -1 ,
-                      `angeklagtVon` INT ( 5 ) DEFAULT -1 ,
-                      `nachtIdentitaet` INT( 10 ) NULL,
-                      `buergermeister` INT ( 2 ) DEFAULT 0,
-                      `hexeHeiltraenke` INT( 10 ) NULL,
-                      `hexeTodestraenke` INT( 5 ) NULL ,
-                      `hexenOpfer` INT ( 5 ) DEFAULT -1 ,
-                      `hexeHeilt` INT (2) DEFAULT 0,
-                      `beschuetzerLetzteRundeBeschuetzt` INT( 5 ) DEFAULT -1 ,
-                      `parErmEingesetzt` INT (2) DEFAULT 0 ,
-                      `verliebtMit` INT ( 5 ) DEFAULT -1 ,
-                      `jaegerDarfSchiessen` INT (2) DEFAULT 0 ,
-                      `buergermeisterDarfWeitergeben` INT (2) DEFAULT 0 ,
-                      `urwolf_anzahl_faehigkeiten` INT ( 5 ) DEFAULT 0,
-                      `dieseNachtGestorben` INT (2) DEFAULT 0 ,
-                      `countdownBis` INT (10) DEFAULT 0 ,
-                      `countdownAb` INT (10) DEFAULT 0 ,
-                      `playerlog` LONGTEXT ,
-                      `popup_text` TEXT ,
-                      `bereit` INT (2) NULL ,
-                      `reload` INT (2) NULL ,
-                      `verifizierungsnr` INT ( 5 ) DEFAULT 0
-                      )  ;
-                      ";
-                    $mysqli->Query($sql);
-                    //Wähle ein Verifizierungs-Passwort aus:
-                    //Dieses dient dazu, um festzustellen, ob es tatsächlich der richtige Spieler ist, der eine Seite lädt
-                    $verifizierungsnr = rand(2,100000);
-                    $stmt = $mysqli->prepare("INSERT INTO $spielID"."_spieler"." (id, name , spielleiter, lebt, reload, verifizierungsnr) VALUES ( 0 , ?, 1 , 0 , 1, ?)");
-                    $stmt->bind_param('si',$_POST['ihrName'],$verifizierungsnr);
-                    $stmt->execute();
-                    $stmt->close();
-                    $sql2 = "
-                      CREATE TABLE `$spielID"."_game` (
-                      `spielphase` INT( 5 ) DEFAULT 0,
-                      `charaktereAufdecken` INT ( 2 ) DEFAULT 0,
-                      `buergermeisterWeitergeben` INT ( 2 ) DEFAULT 0,
-                      `seherSiehtIdentitaet` INT ( 2 ) DEFAULT 1,
-                      `werwolfzahl` INT ( 5 ) DEFAULT 0 ,
-                      `hexenzahl` INT ( 5 ) DEFAULT 0 ,
-                      `seherzahl` INT ( 5 ) DEFAULT 0 ,
-                      `jaegerzahl` INT ( 5 ) DEFAULT 0 ,
-                      `amorzahl` INT ( 2 ) DEFAULT 0 ,
-                      `beschuetzerzahl` INT ( 5 ) DEFAULT 0 ,
-                      `parErmZahl` INT (5) DEFAULT 0 ,
-                      `lykantrophenzahl` INT ( 5 ) DEFAULT 0 ,
-                      `spionezahl` INT ( 5 ) DEFAULT 0 ,
-                      `idiotenzahl` INT ( 5 ) DEFAULT 0 ,
-                      `pazifistenzahl` INT ( 5 ) DEFAULT 0 ,
-                      `altenzahl` INT ( 5 ) DEFAULT 0 ,
-                      `urwolfzahl` INT ( 5 ) DEFAULT 0 ,
-                      `zufaelligeAuswahl` INT ( 2 ) DEFAULT 0 ,
-                      `zufaelligeAuswahlBonus` INT ( 5 ) DEFAULT 0 ,
-                      `werwolfeinstimmig` INT ( 2 ) DEFAULT 1 ,
-                      `werwolfopfer` INT ( 5 ) DEFAULT -1 ,
-                      `werwolftimer1` INT ( 10 ) DEFAULT 60 ,
-                      `werwolfzusatz1` INT ( 10 ) DEFAULT 4 ,
-                      `werwolftimer2` INT ( 10 ) DEFAULT 50 ,
-                      `werwolfzusatz2` INT ( 10 ) DEFAULT 3 ,
-                      `dorftimer` INT ( 10 ) DEFAULT 550 ,
-                      `dorfzusatz` INT ( 10 ) DEFAULT 10 ,
-                      `dorfstichwahltimer` INT ( 10 ) DEFAULT 200 ,
-                      `dorfstichwahlzusatz` INT ( 10 ) DEFAULT 5 ,
-                      `inaktivzeit` INT ( 10 ) DEFAULT 40 ,
-                      `inaktivzeitzusatz` INT ( 10 ) DEFAULT 0 ,
-                      `tagestext` TEXT ,
-                      `nacht` INT ( 5 ) DEFAULT 1 ,
-                      `log` LONGTEXT ,
-                      `list_lebe` LONGTEXT,
-                      `list_lebe_aktualisiert` BIGINT DEFAULT 0,
-                      `list_tot` LONGTEXT,
-                      `list_tot_aktualisiert` BIGINT DEFAULT 0,
-                      `waiting_for_others_time` BIGINT,
-                      `letzterAufruf` BIGINT
-                      ) ;";
-                    $mysqli->Query($sql2);
-                    $mysqli->Query("INSERT INTO $spielID"."_game (spielphase, letzterAufruf) VALUES (0 , ".time().")");
-
-                    //Die SpielID groß mitteilen
-                    echo "<BR><h1 align = 'center'>$spielID</h1><BR>Mit dieser Zahl können andere deinem Spiel beitreten!";
-
-                    //Die eigene SpielID setzen
-                    setcookie ("SpielID", $spielID, time()+172800); //Dauer 2 Tage, länger sollte ein Spiel nicht dauern ;)
-                    setcookie ("eigeneID",0, time()+172800);
-                    setcookie ("verifizierungsnr",$verifizierungsnr, time()+172800);
-                    $_COOKIE["SpielID"]=$spielID;
-                    $_COOKIE["eigeneID"] = 0;
-                    $_COOKIE["verifizieren"] = $verifizierungsnr;
-                    writeGameToLogSpielErstellen($mysqli,$spielID,$_POST['ihrName']);
-                    break; //die Schleife beenden
-                    }
-                }
-                $pageReload = true;
               }
               else
               {

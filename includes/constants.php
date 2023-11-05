@@ -1,8 +1,12 @@
 <?php
-//Constants
-define("_VERSION","v1.2.7");
+//Settings:
+define ("_NOGAMECREATIONERRORMESSAGE", ""); //Falls nicht "": Kein Spiel kann erstellt werden, stattdessen wird der string angezeigt.
+//define ("_NOGAMECREATIONERRORMESSAGE", "Wartungsarbeiten bis ..."); //Falls nicht "": Kein Spiel kann erstellt werden, stattdessen wird der string angezeigt.
 define("_LISTMAXRELOADTIME",3000);
 define("_MAXPLAYERS",50);
+
+//Constants, do not change!
+define("_VERSION","v1.2.7");
 
 //Phasen 
 define ("PHASESETUP",0);
