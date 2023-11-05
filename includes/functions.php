@@ -30,8 +30,14 @@ function loescheAlteSpiele($mysqli)
 
   for ($i = 10000; $i<= 99999; $i++)
   {
-    $alleres = $mysqli ->Query("SELECT * FROM $i"."_game");
-    if(isset($alleres->num_rows))
+    $existiert = True;
+    try{
+      $alleres = $mysqli ->Query("SELECT * FROM $i"."_game");
+    }
+    catch (mysqli_sql_exception $e){ 
+      $existiert = False;
+    }
+    if($existiert && isset($alleres->num_rows))
     {
       $temp = $alleres->fetch_assoc();
       if ($temp['letzterAufruf'] < $zeitpunkt)
@@ -1658,41 +1664,45 @@ function writeGameToLog($mysqli)
   $spielID = $_COOKIE['SpielID'];
   $fileName = "log/Werwolf_log_".date("Y_m").".log";
   $myfile = fopen($fileName, "a");
-  fwrite($myfile,"\n--- SPIEL BEENDET --- \n");
-  fwrite($myfile,"SpielID: $spielID \n");
-  fwrite($myfile,"SpielEnde: ".date("d.m.Y, H:i:s")."\n");
-  //Alle Spieler hineinschreiben:
-  fwrite($myfile,"Spieler:\n");
-  $playerQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
-  while ($temp = $playerQ->fetch_assoc())
-  {
-    fwrite($myfile,$temp['name']."\n");
-  }
-  fwrite($myfile,"Spielverlauf:\n");
-  $gameAssoc = gameAssoc($mysqli);
-  $mitUmbruch = str_replace("<br>","\n",$gameAssoc['log']);
-  fwrite($myfile,$mitUmbruch);
+  if ($myfile){
+    fwrite($myfile,"\n--- SPIEL BEENDET --- \n");
+    fwrite($myfile,"SpielID: $spielID \n");
+    fwrite($myfile,"SpielEnde: ".date("d.m.Y, H:i:s")."\n");
+    //Alle Spieler hineinschreiben:
+    fwrite($myfile,"Spieler:\n");
+    $playerQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
+    while ($temp = $playerQ->fetch_assoc())
+    {
+      fwrite($myfile,$temp['name']."\n");
+    }
+    fwrite($myfile,"Spielverlauf:\n");
+    $gameAssoc = gameAssoc($mysqli);
+    $mitUmbruch = str_replace("<br>","\n",$gameAssoc['log']);
+    fwrite($myfile,$mitUmbruch);
 
-  //Schreibe noch die Überlebenden
-  fwrite($myfile,"Die Überlebenden:\n");
-  $lebendQuery = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
-  while ($temp = $lebendQuery->fetch_assoc())
-  {
-    fwrite($myfile,$temp['name']."(".nachtidentitaetAlsString($temp['nachtIdentitaet'],$mysqli).")\n");
+    //Schreibe noch die Überlebenden
+    fwrite($myfile,"Die Überlebenden:\n");
+    $lebendQuery = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE lebt = 1");
+    while ($temp = $lebendQuery->fetch_assoc())
+    {
+      fwrite($myfile,$temp['name']."(".nachtidentitaetAlsString($temp['nachtIdentitaet'],$mysqli).")\n");
+    }
+    fwrite($myfile,"--- ENDE DES SPIELLOGS ---\n");
+    fclose($myfile);
   }
-  fwrite($myfile,"--- ENDE DES SPIELLOGS ---\n");
-  fclose($myfile);
 }
 
 function writeGameToLogSpielErstellen($mysqli, $spielID, $name)
 {
   $fileName = "log/Werwolf_log_".date("Y_m").".log";
   $myfile = fopen($fileName, "a");
-  fwrite($myfile,"\n--- NEUES SPIEL ERSTELLT --- \n");
-  fwrite($myfile,"SpielID: $spielID \n");
-  fwrite($myfile,"Zeit: ".date("d.m.Y, H:i:s")."\n");
-  fwrite($myfile,"Name des Erstellers: $name \n");
-  fclose($myfile);
+  if ($myfile){
+    fwrite($myfile,"\n--- NEUES SPIEL ERSTELLT --- \n");
+    fwrite($myfile,"SpielID: $spielID \n");
+    fwrite($myfile,"Zeit: ".date("d.m.Y, H:i:s")."\n");
+    fwrite($myfile,"Name des Erstellers: $name \n");
+    fclose($myfile);
+  }
 }
 
 function checkeSiegbedingungen($mysqli)
@@ -1813,11 +1823,13 @@ function setBereit($mysqli,$spielerID,$bereit)
 function gameAssoc($mysqli)
 {
   $spielID = $_COOKIE['SpielID'];
-  if ($gameRes = $mysqli->Query("SELECT * FROM $spielID"."_game"))
-  {
-    $gameA = $gameRes->fetch_assoc();
-    return $gameA;
-  }
+  try{
+    if ($gameRes = $mysqli->Query("SELECT * FROM $spielID"."_game"))
+    {
+      $gameA = $gameRes->fetch_assoc();
+      return $gameA;
+    }
+  }catch(mysqli_sql_exception $e) {}
   return false;
 }
 
@@ -1835,11 +1847,13 @@ function getName($mysqli, $spielerID)
   //Gibt den Namen des Spielers mit der $spielerID zurück
   $spielID = $_COOKIE['SpielID'];
   $spielerID = (int)$spielerID;
-  if ($res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $spielerID"))
-  {
-    $temp = $res->fetch_assoc();
-    return $temp['name'];
-  }
+  try{
+    if ($res = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $spielerID"))
+    {
+      $temp = $res->fetch_assoc();
+      return $temp['name'];
+    }
+  } catch(mysqli_sql_exception $e) {}
   return "Unknown";
 }
 

@@ -143,8 +143,14 @@ p#liste {
           else
           {
             //Schauen, ob es auch einen Eintrag zu diesem Spiel in der Datenbank gibt...
-            $alleres = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
-            if(isset($alleres->num_rows))
+            $spiel_existiert = True;
+            try{
+              $alleres = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
+            }
+            catch (Exception $e) {
+              $spiel_existiert = False;
+            }
+            if($spiel_existiert && isset($alleres->num_rows))
             {
               //Schauen, ob es auch mich als Spieler gibt und meine verifizierungsnr stimmt
               $spielerResult = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $eigeneID AND verifizierungsnr = ".(int)$_COOKIE['verifizierungsnr']);
@@ -1513,8 +1519,14 @@ p#liste {
                 }
                 $spielID = rand(10000,99999);
                 //nachschauen, ob ein Spiel mit dieser Nummer bereits existiert
-                $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
-                if(isset($res->num_rows)){
+                $existiert = False;
+                try {
+                  $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
+                }
+                catch (mysqli_sql_exception $e){
+                  $existiert = True;
+                }
+                if(!$existiert && isset($res->num_rows)){
 
                     //Tabelle existiert
                     }else{
@@ -1635,8 +1647,14 @@ p#liste {
               if ($_POST['ihrName'] != "" && strpos($_POST['ihrName'],"$")===false && strpos($_POST['ihrName'],";")===false && strpos($_POST['ihrName'],'"')===false && strpos($_POST['ihrName'],"'")===false && strpos($_POST['ihrName'],"=")===false)
               {
                 //Name wurde eingegeben. Existiert auch ein Spiel dieser Nummer?
-                $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
-                if(isset($res->num_rows))
+                $existiert = False;
+                try{
+                  $res = $mysqli->Query("SELECT * FROM $spielID"."_spieler");
+                }
+                catch(mysqli_sql_exception $e){
+                  $existiert = True;
+                }
+                if(!$existiert && isset($res->num_rows))
                 {
                   //Ein Spiel dieser Nummer existiert!
                   $verboteneNamen = array("niemanden","niemand","keinen","keiner","dorfbewohner","werwolf","seher","seherin","hexe","hexer","jäger","amor","beschützer","paranormaler ermittler","lykantroph","lykantrophin","spion","spionin","mordlustiger","mordlustige","pazifist","pazifistin","alter mann","alter","alte","alte frau","die alten","alten");
@@ -1645,6 +1663,7 @@ p#liste {
                   $stmt->bind_param('s',$_POST['ihrName']);
                   $stmt->execute();
                   $nameRes = $stmt->get_result();
+                  $stmt->close();
                   if ($nameRes->num_rows <= 0 && !in_array(strtolower($_POST['ihrName']),$verboteneNamen))
                   {
                    //Name gültig
@@ -1696,7 +1715,6 @@ p#liste {
                   {
                      echo "<p class='error' >Der angegebene Name ist bereits vorhanden oder ungültig</p>";
                   }
-                  $stmt->close();
                 }
                 else
                 {
