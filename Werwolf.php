@@ -1820,8 +1820,8 @@ if (isset($_COOKIE['SpielID']))
 </section>
 <footer id="info">
 <?php echo "". _VERSION ?>, Erstellt von Florian Lindenbauer<br>
-<a href="http://www.werwolfonline.eu/info" target="_blank">Was ist Werwolf</a><br>
-<a href="http://www.werwolfonline.eu/info/index.php/anleitung" target="_blank">Anleitung</a><br>
+<a href="https://www.werwolfonline.eu/" target="_blank">Was ist Werwolf</a><br>
+<a href="https://www.werwolfonline.eu/anleitung" target="_blank">Anleitung</a><br>
 </footer>
 
 <script charset="ISO-8859-1" type="text/javascript">
