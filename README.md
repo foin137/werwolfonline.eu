@@ -11,9 +11,6 @@ If you have any comments or tips, please let me know! If you like, you may also 
 # What is required?
 The game is written in php, so you will need a php parser on your webserver.
 
-Output buffering needs to be enabled due to some maybe not quite ideal programming. Otherwise, cookies cannot be set.
-You can find the corresponding setting "output_buffering" in the php.ini file. Setting it to 4096 should work.
-
 You also need a database called "werwolf", you do not need to insert any tables, this is done by the script automatically.
 
 Rename 'includes.example.php' in the 'includes'-folder to 'includes.php' and insert your id, passwort and host.
@@ -30,9 +27,6 @@ Ich würde mich freuen, wenn jemand Tipps oder weitere Vorschläge hat! Wer will
 
 # Was braucht man?
 Einen Webserver mit php interpreter und einer Datenbank namens "werwolf".
-
-Auf dem Webserver muss output buffering aktiviert sein, ansonsten können keine Cookies gespeichert werden.
-Die Einstellung findet man in der php.ini Datei unter "output_buffering". Ein Wert von 4096 sollte funktionieren.
 
 Die Datenbank muss keine Tabellen enthalten, die werden vom php Skript selbst erstellt.
 
