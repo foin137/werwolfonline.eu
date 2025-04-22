@@ -145,10 +145,8 @@ p#liste {
       //Schauen, ob wir uns bereits in einem Spiel befinden!
       if (isset($_COOKIE['SpielID']) && isset($_COOKIE['eigeneID']))
       {
-          $_COOKIE['SpielID'] = (int)$_COOKIE['SpielID'];
-          $_COOKIE['eigeneID'] = (int)$_COOKIE['eigeneID'];
-          $spielID = $_COOKIE['SpielID'];
-          $eigeneID = $_COOKIE['eigeneID'];
+          $spielID = (int)$_COOKIE['SpielID'];
+          $eigeneID = (int)$_COOKIE['eigeneID'];
           if (isset($_POST['spielLoeschen']))
           {
             //Will der Spieler das Spiel löschen?
@@ -1503,7 +1501,7 @@ p#liste {
                           </form>";
                         }
                         echo "<form name='gameLogForm' id='gameLogForm' style='display:none'><div id='gamelogdiv'></div></form>";
-                        echo "<input type='submit' value='spiellog anzeigen' onClick='showGameLog($spielID);'";
+                        echo "<input type='submit' value='spiellog anzeigen' onClick='showGameLog($spielID, $eigeneId);'";
                       }
                     }
                   }
@@ -1657,10 +1655,10 @@ p#liste {
                       //Die eigene SpielID setzen
                       setcookie ("SpielID", $spielID, time()+172800); //Dauer 2 Tage, länger sollte ein Spiel nicht dauern ;)
                       setcookie ("eigeneID",0, time()+172800);
-                      setcookie ("verifizierungsnr",$verifizierungsnr, time()+172800);
+                      setcookie ("verifizierungsnr",$verifizierungsnr, time()+172800, secure: true, httponly: true);
                       $_COOKIE["SpielID"]=$spielID;
                       $_COOKIE["eigeneID"] = 0;
-                      $_COOKIE["verifizieren"] = $verifizierungsnr;
+                      $_COOKIE["verifizierungsnr"] = $verifizierungsnr;
                       writeGameToLogSpielErstellen($mysqli,$spielID,$_POST['ihrName']);
                       break; //die Schleife beenden
                       }
@@ -1937,7 +1935,7 @@ var sekBisTimerBeginn;
     xmlhttp2.send(null);
   }
 
-  function gameLogRefresh(game)
+  function gameLogRefresh(game, id)
   {
     xmlhttp3.onreadystatechange=function()
       {
@@ -1961,17 +1959,17 @@ var sekBisTimerBeginn;
             para.appendChild(temp);
             if (refreshGameLog == 1)
             {
-              setTimeout(gameLogRefresh,8000,game);
+              setTimeout(gameLogRefresh, 8000, game, id);
             }
           }
           else
           {
             //Error
-            setTimeout(gameLogRefresh,2*8000,game);
+            setTimeout(gameLogRefresh, 2*8000, game, id);
           }
         }
       }
-    xmlhttp3.open("GET","gamelogreload.php?game="+ game,true);
+    xmlhttp3.open("GET","gamelogreload.php?game=" + game + "&id=" + $id, true);
     xmlhttp3.send();
   }
 
@@ -2010,7 +2008,7 @@ var sekBisTimerBeginn;
     setTimeout(listRefresh,3000,game,id);
   }
 
-  function showGameLog(game)
+  function showGameLog(game, id)
   {
     var form = document.getElementById("gameLogForm");
     if (form.style.display == "block")
@@ -2021,7 +2019,7 @@ var sekBisTimerBeginn;
     else
     {
       form.style.display = "block";
-      gameLogRefresh(game);
+      gameLogRefresh(game, id);
       refreshGameLog = 1;
     }
   }
