@@ -1,4 +1,4 @@
-<?php
+<?php 
 /*
 
 werwolfonline, a php web game
@@ -18,23 +18,24 @@ werwolfonline, a php web game
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
-  if (isset($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === "development") {
-    include "includes/includes.dev.php";
-  }
-  else {
-    include "includes/includes.php";
-  }
 
-  header("Content-Type: text/html; charset=utf-8");
-  header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
-  header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-  header('Pragma: no-cache');
-  $spielID = (int)$_GET['game'];
-  $id = (int)$_GET['id'];
-  if ($Result = $mysqli->query("SELECT * FROM ".$spielID."_spieler WHERE id = $id"))
-  {
-    $temp = $Result->fetch_assoc();
-    echo $temp['reload'];
-  }
+$host = "db";    // Container name
+$id = "werwolf"; // Nutzername
+$pw = "mariadb"; // Pwd
+$db = "werwolf"; // Db name
 
+$mysqli = new MySQLi(
+    $host,
+    $id,
+    $pw,
+    $db
+);
+      
+if (mysqli_connect_errno()) {
+    printf(
+        "Can't connect to MySQL Server. Errorcode: %s\n",
+        mysqli_connect_error()
+    );   
+    exit;
+}
 ?>

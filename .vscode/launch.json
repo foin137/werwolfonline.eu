@@ -24,6 +24,9 @@
                 "pattern": "Development Server \\(http://0.0.0.0:([0-9]+)\\) started",
                 "uriFormat": "http://localhost:%s/Werwolf.php",
                 "action": "openExternally"
+            },
+            "env": {
+                "ENVIRONMENT": "development"
             }
         },
         {
@@ -37,6 +40,7 @@
                 "-dxdebug.start_with_request=yes"
             ],
             "env": {
+                "ENVIRONMENT": "development",
                 "XDEBUG_MODE": "debug,develop",
                 "XDEBUG_CONFIG": "client_port=${port}"
             }

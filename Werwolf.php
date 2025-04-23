@@ -22,7 +22,6 @@ werwolfonline, a php web game
 ob_start();
 ?>
 
-
 <!DOCTYPE html>
 <HTML>
 <head>
@@ -34,6 +33,14 @@ ob_start();
 <meta http-equiv="Expires" content="Sat, 01 Dec 2001 00:00:00 GMT">
 <link rel="stylesheet" type="text/css" href="style.css">
 <?php
+
+if (isset($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === "development") {
+  include "includes/includes.dev.php";
+}
+else {
+  include "includes/includes.php";
+}
+include "includes/constants.php"; //Hier werden Konstanten für Phasen und Charaktere definiert
 require_once('includes/functions.php');
 
 //Für die Farben ...
@@ -131,8 +138,6 @@ p#liste {
 </section>
 <section id="gameboard">
 <?php
-  include "includes/includes.php"; //Datenbank
-  include "includes/constants.php"; //Hier werden Konstanten für Phasen und Charaktere definiert
   $pageReload = false;
   $listReload = false;
   $aktBeiTime = false; //Bei True aktualisiert der Browser bei Ablauf des Timers
@@ -142,7 +147,6 @@ p#liste {
   $timerAb = 0; //Ab wann Timer und Text angezeigt werdne (Sekunden bis zu dem Zeitpunkt)
   $timerText = ""; //Welcher Text vor dem Timer angezeigt werden soll
   $logButtonAnzeigen = true;
-
 
       //Schauen, ob wir uns bereits in einem Spiel befinden!
       if (isset($_COOKIE['SpielID']) && isset($_COOKIE['eigeneID']))
