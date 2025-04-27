@@ -30,7 +30,7 @@ define("_MAXPLAYERS",50);
 ///////////////////////////////////
 // Constants, do not change!
 ///////////////////////////////////
-define("_VERSION","v1.2.9");
+define("_VERSION","v1.2.10");
 
 //Phasen 
 define ("PHASESETUP",0);
