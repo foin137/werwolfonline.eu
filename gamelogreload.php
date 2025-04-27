@@ -25,7 +25,17 @@ werwolfonline, a php web game
   header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
   header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
   header('Pragma: no-cache');
+
   $spielID = (int)$_GET['game'];
+  $id = (int)$_GET['id'];
+  $verifizierungsNr = (int)$_COOKIE['verifizierungsnr'];
+
+  // Verifizieren, dass es sich um einen spieler des spiels handelt
+  $meinSpieler = $mysqli->query("SELECT 1 FROM ".$spielID."_spieler WHERE id = $id AND verifizierungsnr = $verifizierungsNr");
+  if ($meinSpieler->num_rows != 1)
+  {
+    die("<p class='error'>Sie sind momentan nicht mit diesem Spiel verknüpft!</p>");
+  }
 
   if ($Result = $mysqli->query("SELECT * FROM ".$spielID."_game"))
   {

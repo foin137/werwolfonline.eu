@@ -22,21 +22,28 @@ werwolfonline, a php web game
 
   include "includes/includes.php";
   include "includes/constants.php";
+  
   header("Content-Type: text/html; charset=utf-8");
   header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
   header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
   header('Pragma: no-cache');
+
   $spielID = (int)$_GET['game'];
   $id = (int)$_GET['id'];
+  $verifizierungsNr = (int)$_COOKIE['verifizierungsnr'];
 
   $trennzeichen = "$"; //Das Zeichen, auf das im Skript responded wird
 
-  //Reloaded eine Liste, erfordert komplexeren Code als reload.php
-  //Die Liste, die reloaded wird ist unterschiedlich, je nach Spielphase und eigenem Charakter
-  //Wenn reload gesetzt ist, wird außerdem geschaut, ob ich reloaden muss!
-  $ichLebe = false;
-  $ichLebeQ = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $id");
-  $ichLebeQ = $ichLebeQ->fetch_assoc();
+  $meinSpieler = $mysqli->Query("SELECT * FROM $spielID"."_spieler WHERE id = $id AND verifizierungsnr = $verifizierungsNr");
+  if ($meinSpieler->num_rows != 1)
+  {
+    die("<p class='error'>Sie sind momentan nicht mit diesem Spiel verknüpft!</p>");
+  }
+  
+  // Reloaded eine Liste, erfordert komplexeren Code als reload.php
+  // Die Liste, die reloaded wird ist unterschiedlich, je nach Spielphase und eigenem Charakter
+  // Wenn reload gesetzt ist, wird außerdem geschaut, ob ich reloaden muss!
+  $ichLebeQ = $meinSpieler->fetch_assoc();
   if (isset($_GET['reload']))
   {
     if ($ichLebeQ['reload'] == 1 && $_GET['reload'] == 1)
@@ -49,9 +56,10 @@ werwolfonline, a php web game
       echo "0";
     }
   }
+  
+  $ichLebe = false;
   if ($ichLebeQ['lebt'] == 1)
     $ichLebe = true;
-
 
   $spielRes = $mysqli->Query("SELECT * FROM $spielID"."_game");
   $spielAss = $spielRes->fetch_assoc();
