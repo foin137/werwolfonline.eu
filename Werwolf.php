@@ -1969,7 +1969,7 @@ var sekBisTimerBeginn;
           }
         }
       }
-    xmlhttp3.open("GET","gamelogreload.php?game=" + game + "&id=" + $id, true);
+    xmlhttp3.open("GET","gamelogreload.php?game=" + game + "&id=" + id, true);
     xmlhttp3.send();
   }
 
