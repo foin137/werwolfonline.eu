@@ -18,13 +18,17 @@ werwolfonline, a php web game
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
-  include "includes/includes.php";
+  if (isset($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === "development") {
+    include "includes/includes.dev.php";
+  }
+  else {
+    include "includes/includes.php";
+  }
 
   header("Content-Type: text/html; charset=utf-8");
   header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
   header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
   header('Pragma: no-cache');
-
   $spielID = (int)$_GET['game'];
   $id = (int)$_GET['id'];
   $verifizierungsNr = (int)$_COOKIE['verifizierungsnr'];
