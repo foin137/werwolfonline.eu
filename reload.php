@@ -31,10 +31,11 @@ werwolfonline, a php web game
   header('Pragma: no-cache');
   $spielID = (int)$_GET['game'];
   $id = (int)$_GET['id'];
-  if ($Result = $mysqli->query("SELECT * FROM ".$spielID."_spieler WHERE id = $id"))
+  $verifizierungsNr = (int)$_COOKIE['verifizierungsnr'];
+  
+  if ($Result = $mysqli->query("SELECT * FROM ".$spielID."_spieler WHERE id = $id AND verifizierungsnr = $verifizierungsNr"))
   {
     $temp = $Result->fetch_assoc();
     echo $temp['reload'];
   }
-
 ?>
